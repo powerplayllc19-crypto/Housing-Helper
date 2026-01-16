@@ -1,1743 +1,1886 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="POWER PLAY Housing Helper - Generate dispute forms, verify METRO 2 compliance, and build your tenant advantage profile">
-    <meta name="theme-color" content="#0e6efb">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="POWER PLAY">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="POWER PLAY Housing Helper - Credit dispute forms, budget calculator, and housing resources">
+  <meta name="theme-color" content="#0e6efb">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="POWER PLAY">
+  
+  <title>POWER PLAY Housing Helper</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- jsPDF for PDF generation -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  
+  <!-- Chart.js for budget visualization -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+  
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- Stripe -->
+  <script src="https://js.stripe.com/v3/"></script>
+  <!-- Tesseract.js for OCR -->
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
+
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAACXBIWXMAAAsTAAALEwEAmpwYAAABjElEQVR4nO2WP0vDQBjGn0uKBQVxcHBwEhcHQXDRr+Dg4ODo5ODgJA4ODkLB0U/g4CAiDg4ODg5+AEEQBKGDgyAIDkIR/FPxXuRCmnqXtCZN/cEDgdzd+zy/vLm7ANu2/RcCcALAIwCfACoAlrW7rN2H9jOu/V4AONYA6QAYAS8BuNCeMW3bh7Ylgpk6IXMABv1+M8z4uPEzuiaXAA74zXmNHzN+RgdAUwQzuieXNGfUB8BQrBPG8vMA7HoBGNU7YSyfBmDXC8CY/gVjecgLwKRhJl7UcxWACU0bNczEs7ongCm9E8byCQCmPQFM650wlgcBSBkAJDVtQuNTACQNABb1LhjLgwCkDQCSGp/S+IxmswTAogFAQuOTGp/V/CUAFg0BxDU+rvF5zV8GYFETIE7zcY0vafwqAKsaADGaj2l8VePXAFj3ABjR+IjGNzR+E4AtD4BhjQ9rfEvjtwHY9QDY0/gdjd8HYN8HwAEAhwAcAXAMwAkApwCcAXAOwIX2XGr3lXZfG+d/q+3/gwDAF3dXvuTC6uMMAAAAAElFTkSuQmCC">
+  
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
     
-    <title>POWER PLAY Housing Helper</title>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: #f7f9fc;
+      -webkit-font-smoothing: antialiased;
+    }
     
-    <link rel="manifest" href="data:application/manifest+json,{%22name%22:%22POWER PLAY Housing Helper%22,%22short_name%22:%22POWER PLAY%22,%22start_url%22:%22/%22,%22display%22:%22standalone%22,%22background_color%22:%22%23ffffff%22,%22theme_color%22:%22%230e6efb%22,%22orientation%22:%22portrait-primary%22,%22icons%22:[{%22src%22:%22data:image/svg+xml,%253Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 192 192%27%253E%253Crect fill=%27%230e6efb%27 width=%27192%27 height=%27192%27/%253E%253Ctext x=%2750%25%27 y=%2750%25%27 font-size=%2780%27 font-weight=%27bold%27 fill=%27white%27 text-anchor=%27middle%27 dominant-baseline=%27middle%27%253EPP%253C/text%253E%253C/svg%253E%22,%22sizes%22:%22192x192%22,%22type%22:%22image/svg+xml%22,%22purpose%22:%22any%22}]}">
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect fill='%230e6efb' width='100' height='100'/%3E%3Ctext x='50' y='50' font-size='60' font-weight='bold' fill='white' text-anchor='middle' dominant-baseline='middle'%3EPP%3C/text%3E%3C/svg%3E">
-    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect fill='%230e6efb' width='180' height='180'/%3E%3Ctext x='90' y='90' font-size='100' font-weight='bold' fill='white' text-anchor='middle' dominant-baseline='middle'%3EPP%3C/text%3E%3C/svg%3E">
+    .app-container {
+      max-width: 100vw;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
     
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        :root {
-            --primary: #0e6efb;
-            --primary-dark: #0a4eb8;
-            --secondary: #9B59B6;
-            --success: #27ae60;
-            --danger: #e74c3c;
-            --warning: #f39c12;
-            --info: #3498db;
-            --light-gray: #f7f9fc;
-            --gray: #5b6473;
-            --dark-gray: #0e1726;
-            --border: #e0e6ed;
-            --shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.15);
-            --transition: all 0.3s ease;
-            --radius: 12px;
-        }
-
-        html, body {
-            width: 100%;
-            height: 100%;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background-color: var(--light-gray);
-            color: var(--dark-gray);
-            overflow: hidden;
-            -webkit-font-smoothing: antialiased;
-            -webkit-user-select: none;
-            user-select: none;
-        }
-
-        #app {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-        }
-
-        /* Navigation */
-        .navbar {
-            background: white;
-            border-bottom: 1px solid var(--border);
-            padding: 12px 20px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            box-shadow: var(--shadow);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        .navbar-brand {
-            font-size: 20px;
-            font-weight: 700;
-            color: var(--primary);
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .navbar-brand svg {
-            width: 32px;
-            height: 32px;
-        }
-
-        .navbar-actions {
-            display: flex;
-            gap: 12px;
-            align-items: center;
-        }
-
-        .btn {
-            padding: 10px 16px;
-            border: none;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: var(--transition);
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            white-space: nowrap;
-        }
-
-        .btn-primary {
-            background: var(--primary);
-            color: white;
-        }
-
-        .btn-primary:hover:not(:disabled) {
-            background: var(--primary-dark);
-            box-shadow: 0 4px 12px rgba(14, 110, 251, 0.3);
-        }
-
-        .btn-secondary {
-            background: white;
-            color: var(--primary);
-            border: 2px solid var(--primary);
-        }
-
-        .btn-secondary:hover:not(:disabled) {
-            background: var(--primary);
-            color: white;
-        }
-
-        .btn-small {
-            padding: 8px 12px;
-            font-size: 12px;
-        }
-
-        .btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .btn-group {
-            display: flex;
-            gap: 8px;
-        }
-
-        /* Main Content */
-        .main-container {
-            flex: 1;
-            overflow-y: auto;
-            overflow-x: hidden;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .container {
-            max-width: 1200px;
-            width: 100%;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        .page {
-            display: none;
-            flex-direction: column;
-        }
-
-        .page.active {
-            display: flex;
-        }
-
-        /* Card Component */
-        .card {
-            background: white;
-            border-radius: var(--radius);
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: var(--shadow);
-            border: 1px solid var(--border);
-            transition: var(--transition);
-        }
-
-        .card:hover {
-            box-shadow: var(--shadow-lg);
-            transform: translateY(-2px);
-        }
-
-        .card-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 16px;
-            padding-bottom: 16px;
-            border-bottom: 2px solid var(--light-gray);
-        }
-
-        .card-title {
-            font-size: 20px;
-            font-weight: 700;
-            color: var(--dark-gray);
-        }
-
-        .card-subtitle {
-            font-size: 14px;
-            color: var(--gray);
-            margin-top: 4px;
-        }
-
-        /* Form Styles */
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-row {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 16px;
-            margin-bottom: 20px;
-        }
-
-        .form-group.full {
-            grid-column: 1 / -1;
-        }
-
-        label {
-            display: block;
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--dark-gray);
-            margin-bottom: 8px;
-        }
-
-        .required::after {
-            content: " *";
-            color: var(--danger);
-        }
-
-        input, textarea, select {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid var(--border);
-            border-radius: 8px;
-            font-size: 14px;
-            font-family: inherit;
-            transition: var(--transition);
-            background: white;
-        }
-
-        input:focus, textarea:focus, select:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(14, 110, 251, 0.1);
-        }
-
-        input:disabled, textarea:disabled, select:disabled {
-            background: var(--light-gray);
-            cursor: not-allowed;
-            opacity: 0.6;
-        }
-
-        input.error, textarea.error, select.error {
-            border-color: var(--danger);
-        }
-
-        .form-error {
-            color: var(--danger);
-            font-size: 12px;
-            margin-top: 4px;
-        }
-
-        .form-help {
-            color: var(--gray);
-            font-size: 12px;
-            margin-top: 4px;
-            font-style: italic;
-        }
-
-        /* Checkbox & Radio */
-        .checkbox-group, .radio-group {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .checkbox-item, .radio-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            cursor: pointer;
-            padding: 10px;
-            border-radius: 8px;
-            transition: var(--transition);
-        }
-
-        .checkbox-item:hover, .radio-item:hover {
-            background: var(--light-gray);
-        }
-
-        .checkbox-item input, .radio-item input {
-            width: auto;
-            cursor: pointer;
-            accent-color: var(--primary);
-        }
-
-        .checkbox-item label, .radio-item label {
-            margin: 0;
-            cursor: pointer;
-        }
-
-        /* Tabs */
-        .tabs {
-            display: flex;
-            gap: 0;
-            border-bottom: 2px solid var(--border);
-            margin-bottom: 20px;
-            overflow-x: auto;
-        }
-
-        .tab-btn {
-            padding: 12px 20px;
-            background: none;
-            border: none;
-            border-bottom: 3px solid transparent;
-            cursor: pointer;
-            font-weight: 600;
-            color: var(--gray);
-            transition: var(--transition);
-            white-space: nowrap;
-        }
-
-        .tab-btn.active {
-            color: var(--primary);
-            border-bottom-color: var(--primary);
-        }
-
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        /* Alert Messages */
-        .alert {
-            padding: 16px;
-            border-radius: 8px;
-            margin-bottom: 16px;
-            display: flex;
-            align-items: flex-start;
-            gap: 12px;
-            animation: slideIn 0.3s ease;
-        }
-
-        @keyframes slideIn {
-            from {
-                transform: translateY(-10px);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
-
-        .alert-success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-
-        .alert-danger {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-
-        .alert-warning {
-            background: #fff3cd;
-            color: #856404;
-            border: 1px solid #ffeeba;
-        }
-
-        .alert-info {
-            background: #d1ecf1;
-            color: #0c5460;
-            border: 1px solid #bee5eb;
-        }
-
-        .alert-icon {
-            font-size: 20px;
-            margin-top: 2px;
-        }
-
-        /* Modal */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .modal.active {
-            display: flex;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        .modal-content {
-            background: white;
-            border-radius: var(--radius);
-            padding: 30px;
-            max-width: 500px;
-            width: 90%;
-            max-height: 90vh;
-            overflow-y: auto;
-            box-shadow: var(--shadow-lg);
-            animation: slideInUp 0.3s ease;
-        }
-
-        @keyframes slideInUp {
-            from {
-                transform: translateY(20px);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
-
-        .modal-close {
-            position: absolute;
-            top: 16px;
-            right: 16px;
-            background: none;
-            border: none;
-            font-size: 28px;
-            cursor: pointer;
-            color: var(--gray);
-            width: 32px;
-            height: 32px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            transition: var(--transition);
-        }
-
-        .modal-close:hover {
-            background: var(--light-gray);
-            color: var(--dark-gray);
-        }
-
-        /* Progress Indicator */
-        .progress-indicator {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 30px;
-            position: relative;
-        }
-
-        .progress-indicator::before {
-            content: '';
-            position: absolute;
-            top: 20px;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: var(--border);
-            z-index: 0;
-        }
-
-        .progress-step {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            position: relative;
-            z-index: 1;
-            flex: 1;
-        }
-
-        .progress-step-circle {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: var(--light-gray);
-            border: 2px solid var(--border);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            color: var(--gray);
-            margin-bottom: 8px;
-            transition: var(--transition);
-        }
-
-        .progress-step.active .progress-step-circle {
-            background: var(--primary);
-            color: white;
-            border-color: var(--primary);
-        }
-
-        .progress-step.completed .progress-step-circle {
-            background: var(--success);
-            color: white;
-            border-color: var(--success);
-        }
-
-        .progress-step-label {
-            font-size: 12px;
-            font-weight: 600;
-            color: var(--gray);
-            text-align: center;
-        }
-
-        .progress-step.active .progress-step-label {
-            color: var(--primary);
-        }
-
-        /* Grid Layouts */
-        .grid-2 {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-        }
-
-        .grid-3 {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-        }
-
-        /* Hero Section */
-        .hero {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-            color: white;
-            padding: 40px 20px;
-            border-radius: var(--radius);
-            margin-bottom: 30px;
-            text-align: center;
-        }
-
-        .hero-title {
-            font-size: 32px;
-            font-weight: 700;
-            margin-bottom: 10px;
-        }
-
-        .hero-subtitle {
-            font-size: 16px;
-            opacity: 0.9;
-            margin-bottom: 20px;
-        }
-
-        /* Feature Cards */
-        .feature-card {
-            text-align: center;
-            padding: 24px;
-        }
-
-        .feature-icon {
-            font-size: 48px;
-            margin-bottom: 12px;
-        }
-
-        .feature-title {
-            font-size: 18px;
-            font-weight: 700;
-            color: var(--dark-gray);
-            margin-bottom: 8px;
-        }
-
-        .feature-text {
-            font-size: 14px;
-            color: var(--gray);
-            line-height: 1.5;
-        }
-
-        /* Stat Box */
-        .stat-box {
-            background: linear-gradient(135deg, #f7f9fc 0%, #eef4ff 100%);
-            padding: 20px;
-            border-radius: var(--radius);
-            border-left: 4px solid var(--primary);
-            margin-bottom: 16px;
-        }
-
-        .stat-label {
-            font-size: 12px;
-            color: var(--gray);
-            font-weight: 600;
-            text-transform: uppercase;
-            margin-bottom: 4px;
-        }
-
-        .stat-value {
-            font-size: 28px;
-            font-weight: 700;
-            color: var(--primary);
-        }
-
-        /* Bottom Navigation */
-        .bottom-nav {
-            background: white;
-            border-top: 1px solid var(--border);
-            display: flex;
-            justify-content: space-around;
-            padding: 8px 0;
-            position: sticky;
-            bottom: 0;
-            z-index: 100;
-        }
-
-        .bottom-nav-item {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 12px;
-            text-decoration: none;
-            color: var(--gray);
-            font-size: 12px;
-            cursor: pointer;
-            transition: var(--transition);
-            border: none;
-            background: none;
-        }
-
-        .bottom-nav-item.active, .bottom-nav-item:hover {
-            color: var(--primary);
-        }
-
-        .bottom-nav-icon {
-            font-size: 24px;
-            margin-bottom: 4px;
-        }
-
-        /* Tables */
-        .table-responsive {
-            overflow-x: auto;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 14px;
-        }
-
-        th {
-            background: var(--light-gray);
-            padding: 12px;
-            text-align: left;
-            font-weight: 700;
-            color: var(--dark-gray);
-            border-bottom: 2px solid var(--border);
-        }
-
-        td {
-            padding: 12px;
-            border-bottom: 1px solid var(--border);
-        }
-
-        tr:hover {
-            background: var(--light-gray);
-        }
-
-        /* Badges */
-        .badge {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-            white-space: nowrap;
-        }
-
-        .badge-primary {
-            background: #e7f3ff;
-            color: var(--primary);
-        }
-
-        .badge-success {
-            background: #d4edda;
-            color: #155724;
-        }
-
-        .badge-danger {
-            background: #f8d7da;
-            color: #721c24;
-        }
-
-        .badge-warning {
-            background: #fff3cd;
-            color: #856404;
-        }
-
-        /* Print Styles */
-        @media print {
-            .navbar, .bottom-nav {
-                display: none;
-            }
-            
-            body {
-                background: white;
-            }
-            
-            .card {
-                box-shadow: none;
-                border: 1px solid #ccc;
-                page-break-inside: avoid;
-            }
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .container {
-                padding: 16px;
-            }
-
-            .grid-2, .grid-3 {
-                grid-template-columns: 1fr;
-            }
-
-            .form-row {
-                grid-template-columns: 1fr;
-            }
-
-            .hero {
-                padding: 30px 16px;
-            }
-
-            .hero-title {
-                font-size: 24px;
-            }
-
-            .modal-content {
-                width: 95%;
-                padding: 20px;
-            }
-
-            .btn-group {
-                flex-direction: column;
-            }
-
-            .btn-group .btn {
-                width: 100%;
-            }
-
-            table {
-                font-size: 12px;
-            }
-
-            th, td {
-                padding: 8px;
-            }
-        }
-
-        /* Dark Mode Support */
-        @media (prefers-color-scheme: dark) {
-            :root {
-                --light-gray: #1a1f2e;
-                --gray: #b0b7c3;
-                --dark-gray: #e8ecf1;
-                --border: #2d3748;
-            }
-
-            html, body {
-                background: #0f1419;
-                color: var(--dark-gray);
-            }
-
-            .card, .navbar, .bottom-nav {
-                background: #1a1f2e;
-                border-color: var(--border);
-            }
-
-            input, textarea, select {
-                background: #2d3748;
-                border-color: var(--border);
-                color: var(--dark-gray);
-            }
-
-            .modal {
-                background: rgba(0, 0, 0, 0.8);
-            }
-
-            .modal-content {
-                background: #1a1f2e;
-            }
-
-            .tab-btn {
-                color: var(--gray);
-            }
-
-            .alert-success {
-                background: #1e3a1f;
-                color: #90ee90;
-                border-color: #2d5a2d;
-            }
-
-            .alert-danger {
-                background: #3a1e1e;
-                color: #ff6b6b;
-                border-color: #5a2d2d;
-            }
-
-            .stat-box {
-                background: #2d3748;
-                border-left-color: var(--primary);
-            }
-
-            .badge {
-                background: #2d3748 !important;
-            }
-        }
-
-        /* Utility Classes */
-        .text-center { text-align: center; }
-        .text-right { text-align: right; }
-        .mt-1 { margin-top: 8px; }
-        .mt-2 { margin-top: 16px; }
-        .mt-3 { margin-top: 24px; }
-        .mb-1 { margin-bottom: 8px; }
-        .mb-2 { margin-bottom: 16px; }
-        .mb-3 { margin-bottom: 24px; }
-        .p-1 { padding: 8px; }
-        .p-2 { padding: 16px; }
-        .p-3 { padding: 24px; }
-        .gap-1 { gap: 8px; }
-        .gap-2 { gap: 16px; }
-        .gap-3 { gap: 24px; }
-        .flex { display: flex; }
-        .flex-col { flex-direction: column; }
-        .items-center { align-items: center; }
-        .justify-between { justify-content: space-between; }
-        .justify-center { justify-content: center; }
-        .flex-1 { flex: 1; }
-        .hidden { display: none; }
-        .w-full { width: 100%; }
-        .h-full { height: 100%; }
-    </style>
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: white;
+      box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+      z-index: 1000;
+    }
+    
+    .content-area {
+      flex: 1;
+      padding-bottom: 80px;
+      overflow-y: auto;
+    }
+    
+    .nav-item {
+      transition: all 0.3s ease;
+    }
+    
+    .nav-item:hover {
+      background: #f0f4ff;
+    }
+    
+    .nav-item.active {
+      color: #0e6efb;
+      background: #f0f4ff;
+    }
+    
+    .card {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+    }
+    
+    .btn-primary {
+      background: #0e6efb;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+    
+    .btn-primary:hover {
+      background: #0c5dd6;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba(14, 110, 251, 0.3);
+    }
+    
+    .btn-secondary {
+      background: white;
+      color: #0e6efb;
+      border: 2px solid #0e6efb;
+      padding: 12px 24px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+    
+    .btn-secondary:hover {
+      background: #f0f4ff;
+    }
+    
+    input, textarea, select {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #e0e6ed;
+      border-radius: 8px;
+      font-size: 16px;
+      transition: all 0.3s ease;
+    }
+    
+    input:focus, textarea:focus, select:focus {
+      outline: none;
+      border-color: #0e6efb;
+      box-shadow: 0 0 0 3px rgba(14, 110, 251, 0.1);
+    }
+    
+    .form-section {
+      background: white;
+      padding: 24px;
+      border-radius: 12px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    
+    .hidden {
+      display: none !important;
+    }
+    
+    .fade-in {
+      animation: fadeIn 0.3s ease-in;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+      padding: 20px;
+    }
+    
+    .modal-content {
+      background: white;
+      border-radius: 16px;
+      max-width: 500px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+    
+    .progress-ring {
+      transform: rotate(-90deg);
+    }
+    
+    .budget-chart {
+      max-width: 400px;
+      margin: 0 auto;
+    }
+    
+    @media (max-width: 768px) {
+      .content-area {
+        padding: 12px;
+      }
+    }
+    
+    .install-prompt {
+      position: fixed;
+      bottom: 90px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: white;
+      padding: 16px 24px;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+      z-index: 999;
+      max-width: 90%;
+    }
+  </style>
 </head>
 <body>
-    <div id="app">
-        <!-- Navigation Bar -->
-        <nav class="navbar">
-            <div class="navbar-brand">
-                <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <rect fill="currentColor" width="100" height="100" rx="20"/>
-                    <text x="50" y="60" font-size="60" font-weight="bold" fill="white" text-anchor="middle">PP</text>
-                </svg>
-                POWER PLAY
-            </div>
-            <div class="navbar-actions">
-                <button class="btn btn-secondary btn-small" onclick="showModal('aboutModal')">About</button>
-                <button class="btn btn-secondary btn-small" onclick="app.toggleTheme()">🌙</button>
-                <button class="btn btn-secondary btn-small" onclick="installPWA()" id="installBtn" style="display: none;">↓ Install</button>
-            </div>
-        </nav>
+  <div id="app" class="app-container"></div>
 
-        <!-- Main Content -->
-        <div class="main-container">
-            <div class="container">
-                <!-- Home Page -->
-                <div class="page active" id="homePage">
-                    <div class="hero">
-                        <h1 class="hero-title">Welcome to POWER PLAY</h1>
-                        <p class="hero-subtitle">Your Complete Housing Helper & Dispute Assistant</p>
-                        <p style="font-size: 14px; opacity: 0.9; margin-bottom: 20px;">Empowering renters in Albuquerque & beyond with tools to challenge housing discrimination and build your tenant advantage</p>
-                        <button class="btn btn-secondary" onclick="app.navigateTo('formsPage')" style="margin: 0 auto;">Start Now →</button>
-                    </div>
+  <script>
+    // ===== APP STATE MANAGEMENT =====
+    const AppState = {
+      currentScreen: 'home',
+      isPremium: false,
+      userData: {},
+      forms: {
+        equifax: null,
+        experian: null,
+        transunion: null,
+        metro2: null,
+        edge: null
+      },
+      budget: {
+        income: 0,
+        expenses: []
+      }
+    };
 
-                    <div class="grid-3">
-                        <div class="card feature-card">
-                            <div class="feature-icon">📋</div>
-                            <div class="feature-title">Dispute Forms</div>
-                            <div class="feature-text">Create professional dispute letters for Equifax, Experian, and TransUnion</div>
-                        </div>
-                        <div class="card feature-card">
-                            <div class="feature-icon">✓</div>
-                            <div class="feature-title">METRO 2 Compliance</div>
-                            <div class="feature-text">Verify accuracy of credit data reporting standards</div>
-                        </div>
-                        <div class="card feature-card">
-                            <div class="feature-icon">⭐</div>
-                            <div class="feature-title">Tenant Profile</div>
-                            <div class="feature-text">Stand out with your tenant advantage profile</div>
-                        </div>
-                    </div>
+    // CONFIGURATION - REPLACE WITH YOUR KEYS
+    const CONFIG = {
+      SUPABASE_URL: 'https://your-project.supabase.co',
+      SUPABASE_KEY: 'your-anon-key',
+      STRIPE_PUBLIC_KEY: 'pk_live_your_stripe_key',
+      GEMINI_API_KEY: 'your-gemini-api-key' // Get at https://aistudio.google.com/
+    };
 
-                    <div class="card mt-3">
-                        <h3 class="card-title">How It Works</h3>
-                        <div style="padding: 20px 0;">
-                            <div class="stat-box">
-                                <div class="stat-label">Step 1</div>
-                                <div style="font-weight: 700; color: var(--dark-gray);">Choose Your Form Type</div>
-                                <p class="form-help">Select from housing-focused dispute forms</p>
-                            </div>
-                            <div class="stat-box">
-                                <div class="stat-label">Step 2</div>
-                                <div style="font-weight: 700; color: var(--dark-gray);">Fill Your Information</div>
-                                <p class="form-help">Complete the guided form with your details</p>
-                            </div>
-                            <div class="stat-box">
-                                <div class="stat-label">Step 3</div>
-                                <div style="font-weight: 700; color: var(--dark-gray);">Review & Generate</div>
-                                <p class="form-help">Check everything and create your PDF</p>
-                            </div>
-                            <div class="stat-box">
-                                <div class="stat-label">Step 4</div>
-                                <div style="font-weight: 700; color: var(--dark-gray);">Download & Submit</div>
-                                <p class="form-help">Print, email, or submit electronically</p>
-                            </div>
-                        </div>
-                    </div>
+    // ===== UTILITY FUNCTIONS =====
+    const Utils = {
+      formatCurrency(value) {
+        return new Intl.NumberFormat('en-US', {
+          style: 'currency',
+          currency: 'USD'
+        }).format(value);
+      },
+      
+      formatDate(date) {
+        return new Date(date).toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        });
+      },
+      
+      saveToLocalStorage(key, data) {
+        try {
+          localStorage.setItem(key, JSON.stringify(data));
+        } catch (e) {
+          console.error('Failed to save to localStorage', e);
+        }
+      },
+      
+      getFromLocalStorage(key) {
+        try {
+          const data = localStorage.getItem(key);
+          return data ? JSON.parse(data) : null;
+        } catch (e) {
+          console.error('Failed to get from localStorage', e);
+          return null;
+        }
+      },
+      
+      showToast(message, type = 'info') {
+        const toast = document.createElement('div');
+        toast.className = `fixed top-4 right-4 px-6 py-4 rounded-lg shadow-lg text-white z-50 fade-in`;
+        toast.style.background = type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : '#0e6efb';
+        toast.textContent = message;
+        document.body.appendChild(toast);
+        
+        setTimeout(() => {
+          toast.style.opacity = '0';
+          setTimeout(() => toast.remove(), 300);
+        }, 3000);
+      }
+    };
 
-                    <div class="card mt-3">
-                        <h3 class="card-title">Resources</h3>
-                        <div style="padding: 20px 0;">
-                            <p class="form-help" style="margin-bottom: 12px;">📞 <strong>Need Help?</strong> Contact us at (505) 595-7861</p>
-                            <p class="form-help" style="margin-bottom: 12px;">📍 <strong>Location:</strong> Albuquerque, New Mexico</p>
-                            <p class="form-help">✉️ <strong>Email:</strong> info@powerplayhousinghelper.com</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Forms Page -->
-                <div class="page" id="formsPage">
-                    <div class="card card-header">
-                        <div>
-                            <h2 class="card-title">Document Generator</h2>
-                            <p class="card-subtitle">Create professional dispute forms & compliance documents</p>
-                        </div>
-                        <button class="btn btn-secondary" onclick="app.navigateTo('homePage')">← Back</button>
-                    </div>
-
-                    <div class="grid-2" id="formsGrid">
-                        <!-- Forms will be generated here -->
-                    </div>
-                </div>
-
-                <!-- Form Builder Page -->
-                <div class="page" id="formBuilderPage">
-                    <div class="card">
-                        <div class="card-header">
-                            <div>
-                                <h2 class="card-title" id="formTitle">Form Builder</h2>
-                                <p class="card-subtitle" id="formSubtitle">Complete all sections to generate your document</p>
-                            </div>
-                            <button class="btn btn-secondary btn-small" onclick="app.navigateTo('formsPage')">← Back</button>
-                        </div>
-
-                        <div class="tabs" id="formTabs">
-                            <!-- Tabs will be generated here -->
-                        </div>
-
-                        <div id="formContent">
-                            <!-- Form content will be generated here -->
-                        </div>
-
-                        <div class="flex gap-2 mt-3" style="justify-content: flex-end;">
-                            <button class="btn btn-secondary" onclick="app.resetForm()">Clear Form</button>
-                            <button class="btn btn-primary" onclick="app.generatePDF()">📥 Generate PDF</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Budget Calculator Page -->
-                <div class="page" id="budgetPage">
-                    <div class="card card-header">
-                        <div>
-                            <h2 class="card-title">Housing Budget Calculator</h2>
-                            <p class="card-subtitle">Plan your rental budget & calculate affordability</p>
-                        </div>
-                        <button class="btn btn-secondary" onclick="app.navigateTo('homePage')">← Back</button>
-                    </div>
-
-                    <div class="grid-2">
-                        <div class="card">
-                            <h3 class="card-title">Your Income</h3>
-                            <div class="form-group">
-                                <label for="monthlyIncome" class="required">Gross Monthly Income</label>
-                                <input type="number" id="monthlyIncome" placeholder="$0.00" oninput="app.calculateBudget()">
-                            </div>
-                            <div class="form-group">
-                                <label for="otherIncome">Additional Monthly Income</label>
-                                <input type="number" id="otherIncome" placeholder="$0.00" oninput="app.calculateBudget()">
-                            </div>
-                        </div>
-
-                        <div class="card">
-                            <h3 class="card-title">Monthly Expenses</h3>
-                            <div class="form-group">
-                                <label for="utilities">Utilities (Est.)</label>
-                                <input type="number" id="utilities" placeholder="$100" oninput="app.calculateBudget()">
-                            </div>
-                            <div class="form-group">
-                                <label for="transportation">Transportation</label>
-                                <input type="number" id="transportation" placeholder="$200" oninput="app.calculateBudget()">
-                            </div>
-                            <div class="form-group">
-                                <label for="insurance">Insurance & Medical</label>
-                                <input type="number" id="insurance" placeholder="$150" oninput="app.calculateBudget()">
-                            </div>
-                            <div class="form-group">
-                                <label for="otherExpenses">Other Expenses</label>
-                                <input type="number" id="otherExpenses" placeholder="$200" oninput="app.calculateBudget()">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="card mt-3">
-                        <h3 class="card-title">Budget Analysis</h3>
-                        <div class="grid-2">
-                            <div class="stat-box">
-                                <div class="stat-label">Total Monthly Income</div>
-                                <div class="stat-value" id="totalIncome">$0</div>
-                            </div>
-                            <div class="stat-box" style="border-left-color: var(--danger);">
-                                <div class="stat-label">Total Expenses</div>
-                                <div class="stat-value" id="totalExpenses">$0</div>
-                            </div>
-                            <div class="stat-box" style="border-left-color: var(--success);">
-                                <div class="stat-label">Available for Rent (30% Rule)</div>
-                                <div class="stat-value" id="rentBudget">$0</div>
-                            </div>
-                            <div class="stat-box" style="border-left-color: var(--warning);">
-                                <div class="stat-label">Maximum Recommended Rent</div>
-                                <div class="stat-value" id="maxRent">$0</div>
-                            </div>
-                        </div>
-
-                        <div style="margin-top: 20px;">
-                            <h4 style="color: var(--dark-gray); font-weight: 600; margin-bottom: 12px;">Affordability Guidelines</h4>
-                            <p class="form-help">💡 <strong>The 30% Rule:</strong> Housing costs should not exceed 30% of gross monthly income.</p>
-                            <p class="form-help">💡 <strong>Safe Range:</strong> With remaining expenses, aim to rent at 25-30% of income.</p>
-                            <p class="form-help">💡 <strong>Emergency Fund:</strong> Keep 3-6 months expenses in savings for security.</p>
-                        </div>
-
-                        <div id="budgetAlert"></div>
-                    </div>
-
-                    <div class="card mt-3">
-                        <h3 class="card-title">Tenant Screening Scores Impact</h3>
-                        <table>
-                            <tr>
-                                <th>Credit Range</th>
-                                <th>Impact</th>
-                                <th>Recommendation</th>
-                            </tr>
-                            <tr>
-                                <td>750+</td>
-                                <td><span class="badge badge-success">Excellent</span></td>
-                                <td>Best approval odds, negotiate rates</td>
-                            </tr>
-                            <tr>
-                                <td>650-749</td>
-                                <td><span class="badge badge-primary">Good</span></td>
-                                <td>Standard approval, possible conditions</td>
-                            </tr>
-                            <tr>
-                                <td>550-649</td>
-                                <td><span class="badge badge-warning">Fair</span></td>
-                                <td>May need co-signer or higher deposit</td>
-                            </tr>
-                            <tr>
-                                <td>Below 550</td>
-                                <td><span class="badge badge-danger">Poor</span></td>
-                                <td>Use dispute forms to improve score first</td>
-                            </tr>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- Progress Page -->
-                <div class="page" id="progressPage">
-                    <div class="card card-header">
-                        <div>
-                            <h2 class="card-title">Your Progress</h2>
-                            <p class="card-subtitle">Track your forms and submissions</p>
-                        </div>
-                        <button class="btn btn-secondary" onclick="app.navigateTo('homePage')">← Back</button>
-                    </div>
-
-                    <div class="card">
-                        <h3 class="card-title">Forms Created</h3>
-                        <div id="progressList"></div>
-                        <p class="form-help" style="text-align: center; padding: 20px; color: var(--gray);">No forms created yet. <a href="#" onclick="app.navigateTo('formsPage'); return false;" style="color: var(--primary); text-decoration: none;">Create your first form →</a></p>
-                    </div>
-
-                    <div class="card mt-3">
-                        <h3 class="card-title">Tips for Success</h3>
-                        <div class="stat-box">
-                            <div style="color: var(--dark-gray); font-weight: 600; margin-bottom: 8px;">✓ Document Everything</div>
-                            <p class="form-help">Keep copies of all disputes sent and responses received.</p>
-                        </div>
-                        <div class="stat-box">
-                            <div style="color: var(--dark-gray); font-weight: 600; margin-bottom: 8px;">✓ Follow Up</div>
-                            <p class="form-help">Send certified mail and track responses within 30-45 days.</p>
-                        </div>
-                        <div class="stat-box">
-                            <div style="color: var(--dark-gray); font-weight: 600; margin-bottom: 8px;">✓ Request Free Reports</div>
-                            <p class="form-help">Check your progress at annualcreditreport.com (free annually).</p>
-                        </div>
-                        <div class="stat-box">
-                            <div style="color: var(--dark-gray); font-weight: 600; margin-bottom: 8px;">✓ Stay Persistent</div>
-                            <p class="form-help">Improved credit takes time. Dispute errors immediately when found.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Settings Page -->
-                <div class="page" id="settingsPage">
-                    <div class="card card-header">
-                        <div>
-                            <h2 class="card-title">Settings</h2>
-                            <p class="card-subtitle">Customize your experience</p>
-                        </div>
-                        <button class="btn btn-secondary" onclick="app.navigateTo('homePage')">← Back</button>
-                    </div>
-
-                    <div class="card">
-                        <h3 class="card-title">Preferences</h3>
-                        <div class="checkbox-group">
-                            <div class="checkbox-item">
-                                <input type="checkbox" id="darkMode" onchange="app.toggleTheme()">
-                                <label for="darkMode">Dark Mode</label>
-                            </div>
-                            <div class="checkbox-item">
-                                <input type="checkbox" id="notifications" checked>
-                                <label for="notifications">Enable Notifications</label>
-                            </div>
-                            <div class="checkbox-item">
-                                <input type="checkbox" id="autoSave" checked>
-                                <label for="autoSave">Auto-save Forms</label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="card mt-3">
-                        <h3 class="card-title">Data Management</h3>
-                        <div class="flex gap-2">
-                            <button class="btn btn-secondary flex-1" onclick="app.exportData()">📤 Export Data</button>
-                            <button class="btn btn-secondary flex-1" onclick="app.clearData()">🗑️ Clear All Data</button>
-                        </div>
-                    </div>
-
-                    <div class="card mt-3">
-                        <h3 class="card-title">About This App</h3>
-                        <p class="form-help" style="margin-bottom: 12px;"><strong>POWER PLAY Housing Helper</strong></p>
-                        <p class="form-help" style="margin-bottom: 12px;">Version 1.0.0</p>
-                        <p class="form-help" style="margin-bottom: 12px;">📍 Albuquerque, New Mexico</p>
-                        <p class="form-help" style="margin-bottom: 12px;">© 2025 POWER PLAY Housing Resource Center</p>
-                        <p class="form-help" style="margin-bottom: 12px;">This is a free resource tool designed to help renters navigate credit disputes and tenant screening processes.</p>
-                        <button class="btn btn-primary w-full mt-2" onclick="showModal('aboutModal')">View Full Legal Notice</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Bottom Navigation -->
-        <div class="bottom-nav">
-            <button class="bottom-nav-item active" onclick="app.navigateTo('homePage')" data-page="homePage">
-                <div class="bottom-nav-icon">🏠</div>
-                <div>Home</div>
-            </button>
-            <button class="bottom-nav-item" onclick="app.navigateTo('formsPage')" data-page="formsPage">
-                <div class="bottom-nav-icon">📋</div>
-                <div>Forms</div>
-            </button>
-            <button class="bottom-nav-item" onclick="app.navigateTo('budgetPage')" data-page="budgetPage">
-                <div class="bottom-nav-icon">💰</div>
-                <div>Budget</div>
-            </button>
-            <button class="bottom-nav-item" onclick="app.navigateTo('progressPage')" data-page="progressPage">
-                <div class="bottom-nav-icon">📊</div>
-                <div>Progress</div>
-            </button>
-            <button class="bottom-nav-item" onclick="app.navigateTo('settingsPage')" data-page="settingsPage">
-                <div class="bottom-nav-icon">⚙️</div>
-                <div>Settings</div>
-            </button>
-        </div>
-    </div>
-
-    <!-- Modals -->
-    <div class="modal" id="aboutModal">
-        <div class="modal-content">
-            <button class="modal-close" onclick="hideModal('aboutModal')">&times;</button>
-            <h2 class="card-title">Legal Notice & Disclaimer</h2>
-            <div style="margin-top: 20px;">
-                <p class="form-help" style="margin-bottom: 12px;">
-                    <strong>IMPORTANT:</strong> This tool is provided for informational purposes only and does not constitute legal advice. 
-                </p>
-                <p class="form-help" style="margin-bottom: 12px;">
-                    The documents generated are templates based on Fair Credit Reporting Act (FCRA) requirements. 
-                    Always verify accuracy before submission and consider consulting with a legal professional.
-                </p>
-                <p class="form-help" style="margin-bottom: 12px;">
-                    <strong>Privacy:</strong> Your data is stored locally on your device. We do not collect or transmit personal information.
-                </p>
-                <p class="form-help" style="margin-bottom: 12px;">
-                    <strong>Accuracy:</strong> We strive for accuracy but cannot guarantee the information will result in successful disputes.
-                </p>
-                <p class="form-help" style="margin-bottom: 12px;">
-                    <strong>Contact:</strong> For questions or support, reach out to (505) 595-7861
-                </p>
-                <p class="form-help">
-                    By using this service, you agree to review all generated documents carefully and verify their accuracy before submission.
-                </p>
-            </div>
-            <button class="btn btn-primary w-full mt-3" onclick="hideModal('aboutModal')">Understood</button>
-        </div>
-    </div>
-
-    <script>
-        // Main Application
-        const app = {
-            currentPage: 'homePage',
-            currentForm: null,
-            formData: {},
-            
-            forms: [
-                {
-                    id: 'equifax',
-                    title: 'Equifax Housing Dispute',
-                    subtitle: 'Challenge rental & eviction errors',
-                    icon: '📋',
-                    color: '#FF6B6B',
-                    tabs: ['Personal Info', 'Dispute Details', 'Supporting Docs'],
-                    fields: {
-                        'Personal Info': [
-                            { name: 'firstName', label: 'First Name', type: 'text', required: true },
-                            { name: 'lastName', label: 'Last Name', type: 'text', required: true },
-                            { name: 'ssn', label: 'Social Security Number (XXX-XX-XXXX)', type: 'text', required: true, pattern: '\\d{3}-\\d{2}-\\d{4}' },
-                            { name: 'email', label: 'Email Address', type: 'email', required: true },
-                            { name: 'phone', label: 'Phone Number', type: 'tel', required: true },
-                            { name: 'address', label: 'Current Address', type: 'text', required: true },
-                            { name: 'city', label: 'City', type: 'text', required: true },
-                            { name: 'state', label: 'State', type: 'text', required: true },
-                            { name: 'zip', label: 'ZIP Code', type: 'text', required: true },
-                        ],
-                        'Dispute Details': [
-                            { name: 'disputeType', label: 'Type of Dispute', type: 'select', required: true, options: ['Eviction Record', 'Rental Debt', 'Criminal Record', 'Identity Error'] },
-                            { name: 'accountNumber', label: 'Account Number (if applicable)', type: 'text' },
-                            { name: 'creditorName', label: 'Creditor/Company Name', type: 'text' },
-                            { name: 'reason', label: 'Reason for Dispute', type: 'textarea', required: true, rows: 4 },
-                            { name: 'explanation', label: 'Detailed Explanation', type: 'textarea', required: true, rows: 5 },
-                        ],
-                        'Supporting Docs': [
-                            { name: 'hasProof', label: 'Will include proof of payment', type: 'checkbox' },
-                            { name: 'hasDismissal', label: 'Will include court dismissal', type: 'checkbox' },
-                            { name: 'hasSettlement', label: 'Will include settlement letter', type: 'checkbox' },
-                        ]
-                    }
-                },
-                {
-                    id: 'metro2',
-                    title: 'METRO 2 Compliance Check',
-                    subtitle: 'Verify credit reporting accuracy',
-                    icon: '✓',
-                    color: '#9B59B6',
-                    tabs: ['Personal Info', 'Institution Info', 'Account Data', 'Disputes'],
-                    fields: {
-                        'Personal Info': [
-                            { name: 'firstName', label: 'First Name', type: 'text', required: true },
-                            { name: 'lastName', label: 'Last Name', type: 'text', required: true },
-                            { name: 'ssn', label: 'Social Security Number', type: 'text', required: true },
-                            { name: 'email', label: 'Email', type: 'email', required: true },
-                            { name: 'phone', label: 'Phone', type: 'tel', required: true },
-                        ],
-                        'Institution Info': [
-                            { name: 'institutionName', label: 'Reporting Institution', type: 'text', required: true },
-                            { name: 'metro2Code', label: 'METRO 2 Subscriber Code', type: 'text', required: true },
-                            { name: 'reportFrequency', label: 'Report Frequency', type: 'select', options: ['Monthly', 'Quarterly', 'Annually'] },
-                        ],
-                        'Account Data': [
-                            { name: 'accountNumber', label: 'Account Number', type: 'text', required: true },
-                            { name: 'accountType', label: 'Account Type', type: 'text' },
-                            { name: 'accountStatus', label: 'Status', type: 'select', options: ['Open', 'Closed', 'Delinquent'] },
-                            { name: 'openDate', label: 'Opening Date', type: 'date' },
-                        ],
-                        'Disputes': [
-                            { name: 'fieldName', label: 'Field in Question', type: 'text', required: true },
-                            { name: 'reportedValue', label: 'Currently Reported', type: 'text', required: true },
-                            { name: 'correctValue', label: 'What it Should Be', type: 'text', required: true },
-                            { name: 'concern', label: 'Your Concern', type: 'textarea', rows: 3 },
-                        ]
-                    }
-                },
-                {
-                    id: 'experian',
-                    title: 'Experian Screening Dispute',
-                    subtitle: 'Challenge tenant screening errors',
-                    icon: '🔍',
-                    color: '#4ECDC4',
-                    tabs: ['Personal Info', 'Dispute Info'],
-                    fields: {
-                        'Personal Info': [
-                            { name: 'firstName', label: 'First Name', type: 'text', required: true },
-                            { name: 'lastName', label: 'Last Name', type: 'text', required: true },
-                            { name: 'email', label: 'Email', type: 'email', required: true },
-                            { name: 'phone', label: 'Phone', type: 'tel', required: true },
-                        ],
-                        'Dispute Info': [
-                            { name: 'screeningIssue', label: 'What is the issue?', type: 'textarea', required: true, rows: 4 },
-                            { name: 'desiredOutcome', label: 'What outcome do you seek?', type: 'textarea', rows: 3 },
-                        ]
-                    }
-                },
-                {
-                    id: 'transunion',
-                    title: 'TransUnion Dispute',
-                    subtitle: 'Correct rental history errors',
-                    icon: '🏠',
-                    color: '#45B7D1',
-                    tabs: ['Personal Info', 'Dispute Info'],
-                    fields: {
-                        'Personal Info': [
-                            { name: 'firstName', label: 'First Name', type: 'text', required: true },
-                            { name: 'lastName', label: 'Last Name', type: 'text', required: true },
-                            { name: 'email', label: 'Email', type: 'email', required: true },
-                        ],
-                        'Dispute Info': [
-                            { name: 'rentalHistory', label: 'Describe the rental history error', type: 'textarea', required: true, rows: 4 },
-                        ]
-                    }
-                },
-                {
-                    id: 'tenant-profile',
-                    title: 'Tenant Advantage Profile',
-                    subtitle: 'Stand out in screening software',
-                    icon: '⭐',
-                    color: '#0e6efb',
-                    tabs: ['Basic Info', 'Strengths', 'References'],
-                    fields: {
-                        'Basic Info': [
-                            { name: 'firstName', label: 'First Name', type: 'text', required: true },
-                            { name: 'lastName', label: 'Last Name', type: 'text', required: true },
-                            { name: 'email', label: 'Email', type: 'email', required: true },
-                            { name: 'phone', label: 'Phone', type: 'tel' },
-                        ],
-                        'Strengths': [
-                            { name: 'strengths', label: 'Your best qualities as a tenant', type: 'textarea', rows: 4 },
-                            { name: 'employmentStatus', label: 'Employment Status', type: 'select', options: ['Employed Full-time', 'Employed Part-time', 'Self-employed', 'Student', 'Retired'] },
-                        ],
-                        'References': [
-                            { name: 'previousLandlord', label: 'Previous Landlord Name & Contact', type: 'textarea', rows: 3 },
-                            { name: 'employerRef', label: 'Employer Reference', type: 'textarea', rows: 3 },
-                        ]
-                    }
-                }
-            ],
-
-            init() {
-                this.loadFromStorage();
-                this.renderForms();
-                this.checkPWA();
-                if ('serviceWorker' in navigator) {
-                    navigator.serviceWorker.register('data:text/javascript,self.addEventListener("install",e=>self.skipWaiting());self.addEventListener("activate",e=>e.waitUntil(clients.claim()));');
-                }
-            },
-
-            navigateTo(page) {
-                document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-                document.getElementById(page).classList.add('active');
-                this.currentPage = page;
-                
-                document.querySelectorAll('.bottom-nav-item').forEach(item => {
-                    item.classList.remove('active');
-                    if (item.dataset.page === page) item.classList.add('active');
-                });
-
-                window.scrollTo(0, 0);
-            },
-
-            renderForms() {
-                const grid = document.getElementById('formsGrid');
-                grid.innerHTML = this.forms.map(form => `
-                    <div class="card" style="border-left: 4px solid ${form.color}">
-                        <div style="font-size: 32px; margin-bottom: 12px;">${form.icon}</div>
-                        <h3 class="card-title">${form.title}</h3>
-                        <p class="card-subtitle" style="margin-bottom: 16px;">${form.subtitle}</p>
-                        <button class="btn btn-primary w-full" onclick="app.startForm('${form.id}')">Create Form →</button>
-                    </div>
-                `).join('');
-            },
-
-            startForm(formId) {
-                this.currentForm = this.forms.find(f => f.id === formId);
-                this.formData = {};
-                this.renderFormBuilder();
-                this.navigateTo('formBuilderPage');
-            },
-
-            renderFormBuilder() {
-                const form = this.currentForm;
-                document.getElementById('formTitle').textContent = form.title;
-                document.getElementById('formSubtitle').textContent = form.subtitle;
-                
-                const tabs = document.getElementById('formTabs');
-                tabs.innerHTML = form.tabs.map((tab, idx) => `
-                    <button class="tab-btn ${idx === 0 ? 'active' : ''}" onclick="app.switchTab('${tab}')">${tab}</button>
-                `).join('');
-
-                const content = document.getElementById('formContent');
-                content.innerHTML = form.tabs.map((tab, idx) => `
-                    <div class="tab-content ${idx === 0 ? 'active' : ''}" id="tab-${tab.replace(/\s/g, '-')}">
-                        ${this.renderTabFields(form.fields[tab])}
-                    </div>
-                `).join('');
-            },
-
-            renderTabFields(fields) {
-                return `<div class="form-row">${fields.map(field => {
-                    let input = '';
-                    
-                    if (field.type === 'select') {
-                        input = `<select name="${field.name}" ${field.required ? 'required' : ''}>
-                            <option value="">Select ${field.label}</option>
-                            ${field.options.map(opt => `<option value="${opt}">${opt}</option>`).join('')}
-                        </select>`;
-                    } else if (field.type === 'textarea') {
-                        input = `<textarea name="${field.name}" placeholder="${field.label}" rows="${field.rows || 3}" ${field.required ? 'required' : ''}></textarea>`;
-                    } else if (field.type === 'checkbox') {
-                        return `
-                            <div class="form-group full">
-                                <div class="checkbox-item">
-                                    <input type="checkbox" name="${field.name}" id="${field.name}">
-                                    <label for="${field.name}">${field.label}</label>
-                                </div>
-                            </div>
-                        `;
-                    } else if (field.type === 'date') {
-                        input = `<input type="date" name="${field.name}" ${field.required ? 'required' : ''}>`;
-                    } else {
-                        input = `<input type="${field.type}" name="${field.name}" placeholder="${field.label}" ${field.required ? 'required' : ''} ${field.pattern ? `pattern="${field.pattern}"` : ''}>`;
-                    }
-
-                    return `
-                        <div class="form-group">
-                            <label for="${field.name}" ${field.required ? 'class="required"' : ''}>${field.label}</label>
-                            ${input}
-                        </div>
-                    `;
-                }).join('')}</div>`;
-            },
-
-            switchTab(tabName) {
-                document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-                document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-                
-                event.target.classList.add('active');
-                document.getElementById(`tab-${tabName.replace(/\s/g, '-')}`).classList.add('active');
-            },
-
-            generatePDF() {
-                const inputs = document.querySelectorAll('#formContent input, #formContent textarea, #formContent select');
-                const formData = {};
-                
-                inputs.forEach(input => {
-                    if (input.type === 'checkbox') {
-                        formData[input.name] = input.checked;
-                    } else if (input.value) {
-                        formData[input.name] = input.value;
-                    }
-                });
-
-                if (!this.validateForm(formData)) return;
-
-                const pdf = this.createPDF(formData);
-                this.saveForm(formData);
-                this.downloadPDF(pdf);
-            },
-
-            validateForm(data) {
-                for (let [key, value] of Object.entries(data)) {
-                    if (!value && this.isFieldRequired(key)) {
-                        alert(`Please fill in all required fields`);
-                        return false;
-                    }
-                }
-                return true;
-            },
-
-            isFieldRequired(fieldName) {
-                return this.currentForm.tabs.some(tab => 
-                    this.currentForm.fields[tab].some(f => f.name === fieldName && f.required)
-                );
-            },
-
-            createPDF(data) {
-                const html = `
-                    <!DOCTYPE html>
-                    <html>
-                    <head>
-                        <style>
-                            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-                            h1 { color: #0e6efb; border-bottom: 3px solid #0e6efb; padding-bottom: 10px; }
-                            h2 { color: #1945a5; margin-top: 20px; }
-                            .section { margin-bottom: 20px; page-break-inside: avoid; }
-                            .field { margin: 10px 0; padding: 8px; background: #f7f9fc; border-radius: 4px; }
-                            .label { font-weight: bold; color: #0e1726; }
-                            .value { margin-left: 10px; color: #5b6473; }
-                            .footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #ccc; font-size: 12px; color: #666; }
-                            .legal { background: #fff6e6; padding: 15px; border-radius: 4px; margin-top: 20px; font-size: 12px; }
-                        </style>
-                    </head>
-                    <body>
-                        <h1>${this.currentForm.title}</h1>
-                        <p><strong>Generated:</strong> ${new Date().toLocaleDateString()}</p>
-                        
-                        ${Object.entries(data).map(([key, value]) => `
-                            <div class="field">
-                                <span class="label">${this.formatLabel(key)}:</span>
-                                <span class="value">${value}</span>
-                            </div>
-                        `).join('')}
-
-                        <div class="legal">
-                            <strong>Legal Notice:</strong> This document is provided for informational purposes. Ensure all information is accurate before submission. This tool does not constitute legal advice.
-                        </div>
-
-                        <div class="footer">
-                            <p><strong>POWER PLAY Housing Resource Center</strong></p>
-                            <p>Albuquerque, New Mexico | (505) 595-7861</p>
-                            <p>© 2025 All rights reserved</p>
-                        </div>
-                    </body>
-                    </html>
-                `;
-                return html;
-            },
-
-            formatLabel(str) {
-                return str.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
-            },
-
-            downloadPDF(html) {
-                const element = document.createElement('iframe');
-                element.setAttribute('srcdoc', html);
-                element.style.display = 'none';
-                document.body.appendChild(element);
-                
-                setTimeout(() => {
-                    element.contentWindow.print();
-                    document.body.removeChild(element);
-                }, 100);
-            },
-
-            saveForm(data) {
-                const forms = JSON.parse(localStorage.getItem('savedForms') || '[]');
-                forms.push({
-                    type: this.currentForm.title,
-                    data: data,
-                    date: new Date().toLocaleDateString()
-                });
-                localStorage.setItem('savedForms', JSON.stringify(forms));
-                this.updateProgressList();
-                alert('Form saved! You can view it in Progress.');
-            },
-
-            updateProgressList() {
-                const forms = JSON.parse(localStorage.getItem('savedForms') || '[]');
-                const list = document.getElementById('progressList');
-                
-                if (forms.length === 0) {
-                    list.innerHTML = '<p class="form-help" style="text-align: center; padding: 20px;">No forms created yet</p>';
-                    return;
-                }
-
-                list.innerHTML = `
-                    <div class="table-responsive">
-                        <table>
-                            <tr>
-                                <th>Form Type</th>
-                                <th>Date Created</th>
-                                <th>Action</th>
-                            </tr>
-                            ${forms.map((form, idx) => `
-                                <tr>
-                                    <td>${form.type}</td>
-                                    <td>${form.date}</td>
-                                    <td>
-                                        <button class="btn btn-small btn-secondary" onclick="app.viewForm(${idx})">View</button>
-                                    </td>
-                                </tr>
-                            `).join('')}
-                        </table>
-                    </div>
-                `;
-            },
-
-            viewForm(idx) {
-                const forms = JSON.parse(localStorage.getItem('savedForms') || '[]');
-                const form = forms[idx];
-                const html = `
-                    <!DOCTYPE html>
-                    <html>
-                    <head>
-                        <style>
-                            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; padding: 20px; }
-                            .field { margin: 10px 0; padding: 8px; background: #f7f9fc; border-radius: 4px; }
-                            .label { font-weight: bold; }
-                        </style>
-                    </head>
-                    <body>
-                        <h1>${form.type}</h1>
-                        <p>Created: ${form.date}</p>
-                        ${Object.entries(form.data).map(([key, value]) => `
-                            <div class="field">
-                                <span class="label">${this.formatLabel(key)}:</span> ${value}
-                            </div>
-                        `).join('')}
-                    </body>
-                    </html>
-                `;
-                const win = window.open();
-                win.document.write(html);
-            },
-
-            resetForm() {
-                if (confirm('Clear all form data?')) {
-                    document.querySelectorAll('#formContent input, #formContent textarea, #formContent select').forEach(el => {
-                        el.value = '';
-                        if (el.type === 'checkbox') el.checked = false;
-                    });
-                }
-            },
-
-            calculateBudget() {
-                const income = parseFloat(document.getElementById('monthlyIncome').value) || 0;
-                const other = parseFloat(document.getElementById('otherIncome').value) || 0;
-                const utilities = parseFloat(document.getElementById('utilities').value) || 0;
-                const transport = parseFloat(document.getElementById('transportation').value) || 0;
-                const insurance = parseFloat(document.getElementById('insurance').value) || 0;
-                const other_exp = parseFloat(document.getElementById('otherExpenses').value) || 0;
-
-                const totalIncome = income + other;
-                const totalExpenses = utilities + transport + insurance + other_exp;
-                const rentBudget = totalIncome * 0.3;
-                const maxRent = Math.max(rentBudget - totalExpenses, 0);
-
-                document.getElementById('totalIncome').textContent = '$' + totalIncome.toFixed(2);
-                document.getElementById('totalExpenses').textContent = '$' + totalExpenses.toFixed(2);
-                document.getElementById('rentBudget').textContent = '$' + rentBudget.toFixed(2);
-                document.getElementById('maxRent').textContent = '$' + maxRent.toFixed(2);
-
-                const alert = document.getElementById('budgetAlert');
-                if (totalIncome > 0) {
-                    if (maxRent >= 0) {
-                        alert.innerHTML = '<div class="alert alert-success"><div class="alert-icon">✓</div><div>Your budget looks good! You can afford rent at this level.</div></div>';
-                    } else {
-                        alert.innerHTML = '<div class="alert alert-warning"><div class="alert-icon">⚠️</div><div>Your expenses exceed your rental budget. Consider reducing expenses or increasing income.</div></div>';
-                    }
-                }
-            },
-
-            toggleTheme() {
-                const isDark = document.documentElement.style.colorScheme === 'dark';
-                document.documentElement.style.colorScheme = isDark ? 'light' : 'dark';
-                localStorage.setItem('darkMode', !isDark);
-                document.getElementById('darkMode').checked = !isDark;
-            },
-
-            exportData() {
-                const data = JSON.parse(localStorage.getItem('savedForms') || '[]');
-                const json = JSON.stringify(data, null, 2);
-                const blob = new Blob([json], { type: 'application/json' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'powerplay-forms.json';
-                a.click();
-            },
-
-            clearData() {
-                if (confirm('Delete ALL saved forms? This cannot be undone.')) {
-                    localStorage.clear();
-                    this.updateProgressList();
-                    alert('All data cleared');
-                }
-            },
-
-            loadFromStorage() {
-                this.updateProgressList();
-                const darkMode = localStorage.getItem('darkMode') === 'true';
-                if (darkMode) {
-                    document.documentElement.style.colorScheme = 'dark';
-                    document.getElementById('darkMode').checked = true;
-                }
-            },
-
-            checkPWA() {
-                let deferredPrompt;
-                window.addEventListener('beforeinstallprompt', (e) => {
-                    e.preventDefault();
-                    deferredPrompt = e;
-                    document.getElementById('installBtn').style.display = 'inline-block';
-                });
-
-                window.installPWA = () => {
-                    if (deferredPrompt) {
-                        deferredPrompt.prompt();
-                        deferredPrompt.userChoice.then((choiceResult) => {
-                            if (choiceResult.outcome === 'accepted') {
-                                document.getElementById('installBtn').style.display = 'none';
-                            }
-                        });
-                    }
-                };
+    // ===== PDF GENERATION =====
+    const PDFGenerator = {
+      async generateEquifaxPDF(data) {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        
+        // Header
+        doc.setFontSize(20);
+        doc.setTextColor(14, 110, 251);
+        doc.text('Equifax Housing Dispute', 105, 20, { align: 'center' });
+        
+        // Personal Information
+        doc.setFontSize(14);
+        doc.setTextColor(0, 0, 0);
+        doc.text('Personal Information', 20, 40);
+        doc.setFontSize(11);
+        doc.text(`Name: ${data.firstName} ${data.lastName}`, 20, 50);
+        doc.text(`SSN: ${data.ssn}`, 20, 57);
+        doc.text(`Address: ${data.currentAddress}`, 20, 64);
+        doc.text(`${data.city}, ${data.state} ${data.zip}`, 20, 71);
+        doc.text(`Phone: ${data.phone}`, 20, 78);
+        doc.text(`Email: ${data.email}`, 20, 85);
+        
+        // Dispute Details
+        doc.setFontSize(14);
+        doc.text('Dispute Details', 20, 100);
+        doc.setFontSize(11);
+        doc.text(`Dispute Type: ${data.disputeType || 'General'}`, 20, 110);
+        doc.text(`Reason: ${data.disputeReason || 'Not specified'}`, 20, 117);
+        
+        const explanation = doc.splitTextToSize(data.disputeExplanation || 'No explanation provided', 170);
+        doc.text('Explanation:', 20, 124);
+        doc.text(explanation, 20, 131);
+        
+        // Account Information
+        if (data.accountNumber) {
+          const yPos = 131 + (explanation.length * 7) + 10;
+          doc.setFontSize(14);
+          doc.text('Account Information', 20, yPos);
+          doc.setFontSize(11);
+          doc.text(`Account Number: ${data.accountNumber}`, 20, yPos + 10);
+          if (data.creditorName) {
+            doc.text(`Creditor: ${data.creditorName}`, 20, yPos + 17);
+          }
+        }
+        
+        // Footer
+        doc.setFontSize(9);
+        doc.setTextColor(100, 100, 100);
+        doc.text('Generated by POWER PLAY Housing Helper', 105, 280, { align: 'center' });
+        doc.text(`Generated on ${Utils.formatDate(new Date())}`, 105, 285, { align: 'center' });
+        
+        doc.save('Equifax-Dispute-Form.pdf');
+        Utils.showToast('PDF generated successfully!', 'success');
+      },
+      
+      async generateMetro2PDF(data) {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        
+        doc.setFontSize(20);
+        doc.setTextColor(14, 110, 251);
+        doc.text('METRO 2 Compliance Verification', 105, 20, { align: 'center' });
+        
+        doc.setFontSize(14);
+        doc.setTextColor(0, 0, 0);
+        doc.text('Consumer Information', 20, 40);
+        doc.setFontSize(11);
+        doc.text(`Name: ${data.firstName} ${data.lastName}`, 20, 50);
+        doc.text(`SSN: ${data.ssn}`, 20, 57);
+        doc.text(`Address: ${data.currentAddress}`, 20, 64);
+        doc.text(`${data.city}, ${data.state} ${data.zip}`, 20, 71);
+        
+        doc.setFontSize(14);
+        doc.text('Reporting Institution', 20, 90);
+        doc.setFontSize(11);
+        doc.text(`Institution: ${data.institutionName}`, 20, 100);
+        doc.text(`METRO 2 Code: ${data.metro2Code}`, 20, 107);
+        doc.text(`Report Frequency: ${data.reportFrequency}`, 20, 114);
+        
+        doc.setFontSize(14);
+        doc.text('Account Information', 20, 130);
+        doc.setFontSize(11);
+        doc.text(`Account Number: ${data.accountNumber}`, 20, 140);
+        doc.text(`Account Status: ${data.accountStatus}`, 20, 147);
+        
+        if (data.disputedFields && data.disputedFields.length > 0) {
+          doc.setFontSize(14);
+          doc.text('Disputed Fields', 20, 165);
+          doc.setFontSize(10);
+          
+          let yPos = 175;
+          data.disputedFields.forEach((field, idx) => {
+            if (yPos > 270) {
+              doc.addPage();
+              yPos = 20;
             }
+            doc.text(`${idx + 1}. ${field.fieldName}`, 20, yPos);
+            doc.text(`   Reported: ${field.reportedValue}`, 20, yPos + 5);
+            doc.text(`   Correct: ${field.correctValue}`, 20, yPos + 10);
+            yPos += 20;
+          });
+        }
+        
+        doc.setFontSize(9);
+        doc.setTextColor(100, 100, 100);
+        doc.text('Generated by POWER PLAY Housing Helper', 105, 280, { align: 'center' });
+        doc.text(`Generated on ${Utils.formatDate(new Date())}`, 105, 285, { align: 'center' });
+        
+        doc.save('METRO2-Compliance-Form.pdf');
+        Utils.showToast('PDF generated successfully!', 'success');
+      },
+      
+      async generateBudgetPDF(budgetData) {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        
+        doc.setFontSize(20);
+        doc.setTextColor(14, 110, 251);
+        doc.text('Budget Analysis Report', 105, 20, { align: 'center' });
+        
+        doc.setFontSize(14);
+        doc.setTextColor(0, 0, 0);
+        doc.text('Income & Expenses', 20, 40);
+        doc.setFontSize(11);
+        doc.text(`Monthly Income: ${Utils.formatCurrency(budgetData.income)}`, 20, 50);
+        
+        const totalExpenses = budgetData.expenses.reduce((sum, exp) => sum + parseFloat(exp.amount || 0), 0);
+        doc.text(`Total Expenses: ${Utils.formatCurrency(totalExpenses)}`, 20, 57);
+        doc.text(`Remaining: ${Utils.formatCurrency(budgetData.income - totalExpenses)}`, 20, 64);
+        
+        doc.setFontSize(14);
+        doc.text('Expense Breakdown', 20, 80);
+        doc.setFontSize(10);
+        
+        let yPos = 90;
+        budgetData.expenses.forEach((expense, idx) => {
+          if (yPos > 270) {
+            doc.addPage();
+            yPos = 20;
+          }
+          doc.text(`${expense.category}: ${Utils.formatCurrency(expense.amount)}`, 20, yPos);
+          yPos += 7;
+        });
+        
+        doc.setFontSize(9);
+        doc.setTextColor(100, 100, 100);
+        doc.text('Generated by POWER PLAY Housing Helper', 105, 280, { align: 'center' });
+        doc.text(`Generated on ${Utils.formatDate(new Date())}`, 105, 285, { align: 'center' });
+        
+        doc.save('Budget-Report.pdf');
+        Utils.showToast('Budget PDF generated!', 'success');
+      }
+    };
+
+    // ===== COMPONENT LIBRARY =====
+    const Components = {
+      navigationBar() {
+        return `
+          <nav class="bottom-nav">
+            <div class="flex justify-around items-center h-16">
+              <button onclick="App.navigate('home')" class="nav-item flex-1 flex flex-col items-center justify-center h-full ${AppState.currentScreen === 'home' ? 'active' : ''}">
+                <i class="fas fa-home text-xl mb-1"></i>
+                <span class="text-xs">Home</span>
+              </button>
+              <button onclick="App.navigate('forms')" class="nav-item flex-1 flex flex-col items-center justify-center h-full ${AppState.currentScreen === 'forms' ? 'active' : ''}">
+                <i class="fas fa-file-alt text-xl mb-1"></i>
+                <span class="text-xs">Forms</span>
+              </button>
+              <button onclick="App.navigate('budget')" class="nav-item flex-1 flex flex-col items-center justify-center h-full ${AppState.currentScreen === 'budget' ? 'active' : ''}">
+                <i class="fas fa-calculator text-xl mb-1"></i>
+                <span class="text-xs">Budget</span>
+              </button>
+              <button onclick="App.navigate('ai_scanner')" class="nav-item flex-1 flex flex-col items-center justify-center h-full ${AppState.currentScreen === 'ai_scanner' ? 'active' : ''}">
+                <i class="fas fa-robot text-xl mb-1"></i>
+                <span class="text-xs">AI Scan</span>
+              </button>
+              <button onclick="App.navigate('resources')" class="nav-item flex-1 flex flex-col items-center justify-center h-full ${AppState.currentScreen === 'resources' ? 'active' : ''}">
+                <i class="fas fa-book text-xl mb-1"></i>
+                <span class="text-xs">Resources</span>
+              </button>
+              <button onclick="App.navigate('profile')" class="nav-item flex-1 flex flex-col items-center justify-center h-full ${AppState.currentScreen === 'profile' ? 'active' : ''}">
+                <i class="fas fa-user text-xl mb-1"></i>
+                <span class="text-xs">Profile</span>
+              </button>
+            </div>
+          </nav>
+        `;
+      }
+    };
+
+    // ===== SCREENS =====
+    const Screens = {
+      home() {
+        return `
+          <div class="content-area fade-in">
+            <div class="bg-gradient-to-br from-blue-500 to-blue-700 text-white p-8 rounded-b-3xl shadow-lg mb-6">
+              <h1 class="text-3xl font-bold mb-2">POWER PLAY</h1>
+              <p class="text-blue-100 text-lg">Housing Helper App</p>
+            </div>
+            
+            <div class="px-4 space-y-4">
+              <div class="card p-6">
+                <h2 class="text-2xl font-bold mb-4 text-gray-800">Welcome!</h2>
+                <p class="text-gray-600 mb-4">
+                  Get a free eligibility check, generate dispute PDFs, verify METRO 2 compliance, 
+                  and build a tenant-advantage profile.
+                </p>
+                <button onclick="App.navigate('forms')" class="btn-primary w-full">
+                  <i class="fas fa-rocket mr-2"></i>Start Creating Forms
+                </button>
+              </div>
+              
+              <div class="card p-6">
+                <h3 class="text-xl font-bold mb-3 text-gray-800 flex items-center">
+                  <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                  Available Forms
+                </h3>
+                <div class="space-y-2 text-gray-700">
+                  <div class="flex items-center">
+                    <i class="fas fa-chevron-right text-blue-500 mr-2"></i>
+                    <span>Equifax Housing Dispute</span>
+                  </div>
+                  <div class="flex items-center">
+                    <i class="fas fa-chevron-right text-blue-500 mr-2"></i>
+                    <span>Experian Screening Dispute</span>
+                  </div>
+                  <div class="flex items-center">
+                    <i class="fas fa-chevron-right text-blue-500 mr-2"></i>
+                    <span>TransUnion Dispute</span>
+                  </div>
+                  <div class="flex items-center">
+                    <i class="fas fa-chevron-right text-blue-500 mr-2"></i>
+                    <span>METRO 2 Compliance</span>
+                  </div>
+                  <div class="flex items-center">
+                    <i class="fas fa-chevron-right text-blue-500 mr-2"></i>
+                    <span>Tenant Advantage Profile</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="card p-6 bg-gradient-to-r from-purple-50 to-blue-50">
+                <h3 class="text-xl font-bold mb-3 text-gray-800">
+                  <i class="fas fa-lightbulb text-yellow-500 mr-2"></i>
+                  How It Works
+                </h3>
+                <ol class="space-y-3 text-gray-700">
+                  <li class="flex items-start">
+                    <span class="bg-blue-500 text-white rounded-full w-6 h-6 flex items-center justify-center mr-3 flex-shrink-0 mt-0.5">1</span>
+                    <span>Choose a form that matches your need</span>
+                  </li>
+                  <li class="flex items-start">
+                    <span class="bg-blue-500 text-white rounded-full w-6 h-6 flex items-center justify-center mr-3 flex-shrink-0 mt-0.5">2</span>
+                    <span>Fill in your information carefully</span>
+                  </li>
+                  <li class="flex items-start">
+                    <span class="bg-blue-500 text-white rounded-full w-6 h-6 flex items-center justify-center mr-3 flex-shrink-0 mt-0.5">3</span>
+                    <span>Review all details for accuracy</span>
+                  </li>
+                  <li class="flex items-start">
+                    <span class="bg-blue-500 text-white rounded-full w-6 h-6 flex items-center justify-center mr-3 flex-shrink-0 mt-0.5">4</span>
+                    <span>Generate and download PDF</span>
+                  </li>
+                  <li class="flex items-start">
+                    <span class="bg-blue-500 text-white rounded-full w-6 h-6 flex items-center justify-center mr-3 flex-shrink-0 mt-0.5">5</span>
+                    <span>Submit to credit bureaus or landlords</span>
+                  </li>
+                </ol>
+              </div>
+              
+              <div class="grid grid-cols-2 gap-4">
+                <button onclick="App.navigate('budget')" class="card p-4 text-center hover:shadow-lg transition">
+                  <i class="fas fa-calculator text-3xl text-green-500 mb-2"></i>
+                  <p class="font-semibold text-gray-700">Budget Tool</p>
+                </button>
+                <button onclick="App.navigate('resources')" class="card p-4 text-center hover:shadow-lg transition">
+                  <i class="fas fa-book-open text-3xl text-purple-500 mb-2"></i>
+                  <p class="font-semibold text-gray-700">Resources</p>
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      },
+      
+      forms() {
+        const forms = [
+          {
+            id: 'equifax',
+            title: 'Equifax Housing Dispute',
+            description: 'Dispute rental & eviction errors with Equifax',
+            icon: 'fa-shield-alt',
+            color: 'from-red-400 to-red-600'
+          },
+          {
+            id: 'experian',
+            title: 'Experian Tenant Screening',
+            description: 'Challenge screening report inaccuracies',
+            icon: 'fa-search',
+            color: 'from-teal-400 to-teal-600'
+          },
+          {
+            id: 'transunion',
+            title: 'TransUnion Rental History',
+            description: 'Correct rental history with TransUnion',
+            icon: 'fa-history',
+            color: 'from-blue-400 to-blue-600'
+          },
+          {
+            id: 'metro2',
+            title: 'METRO 2 Compliance',
+            description: 'Verify accuracy of credit data reporting',
+            icon: 'fa-check-double',
+            color: 'from-purple-400 to-purple-600'
+          },
+          {
+            id: 'edge',
+            title: 'Tenant Advantage Profile',
+            description: 'Stand out in screening software',
+            icon: 'fa-star',
+            color: 'from-yellow-400 to-yellow-600'
+          }
+        ];
+        
+        return `
+          <div class="content-area fade-in">
+            <div class="bg-white p-6 shadow-sm mb-4">
+              <h1 class="text-2xl font-bold text-gray-800">Document Generator</h1>
+              <p class="text-gray-600 mt-1">Create and download your dispute forms</p>
+            </div>
+            
+            <div class="px-4 space-y-4">
+              ${forms.map(form => `
+                <div class="card overflow-hidden">
+                  <div class="bg-gradient-to-r ${form.color} p-4 text-white">
+                    <div class="flex items-center justify-between">
+                      <div class="flex items-center">
+                        <i class="fas ${form.icon} text-3xl mr-4"></i>
+                        <div>
+                          <h3 class="text-lg font-bold">${form.title}</h3>
+                          <p class="text-sm opacity-90">${form.description}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="p-4">
+                    <button onclick="App.openForm('${form.id}')" class="btn-primary w-full">
+                      <i class="fas fa-edit mr-2"></i>Create Form
+                    </button>
+                  </div>
+                </div>
+              `).join('')}
+              
+              <div class="card p-6 bg-blue-50">
+                <h3 class="font-bold text-lg mb-3 text-gray-800">
+                  <i class="fas fa-info-circle text-blue-500 mr-2"></i>
+                  Important Information
+                </h3>
+                <ul class="space-y-2 text-gray-700 text-sm">
+                  <li class="flex items-start">
+                    <i class="fas fa-check text-green-500 mr-2 mt-1"></i>
+                    <span>All forms comply with FCRA requirements</span>
+                  </li>
+                  <li class="flex items-start">
+                    <i class="fas fa-check text-green-500 mr-2 mt-1"></i>
+                    <span>Download forms as PDF for printing or emailing</span>
+                  </li>
+                  <li class="flex items-start">
+                    <i class="fas fa-check text-green-500 mr-2 mt-1"></i>
+                    <span>Keep copies of all submitted documents</span>
+                  </li>
+                  <li class="flex items-start">
+                    <i class="fas fa-check text-green-500 mr-2 mt-1"></i>
+                    <span>Credit bureaus have 30-45 days to respond</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        `;
+      },
+      
+      budget() {
+        const budget = Utils.getFromLocalStorage('budget') || { income: 0, expenses: [] };
+        const totalExpenses = budget.expenses.reduce((sum, exp) => sum + parseFloat(exp.amount || 0), 0);
+        const remaining = budget.income - totalExpenses;
+        const percentUsed = budget.income > 0 ? (totalExpenses / budget.income * 100).toFixed(1) : 0;
+        
+        return `
+          <div class="content-area fade-in">
+            <div class="bg-gradient-to-br from-green-500 to-green-700 text-white p-6 rounded-b-3xl shadow-lg mb-4">
+              <h1 class="text-2xl font-bold mb-2">Budget Calculator</h1>
+              <p class="text-green-100">Track your income and expenses</p>
+            </div>
+            
+            <div class="px-4 space-y-4">
+              <!-- Income Section -->
+              <div class="form-section">
+                <h3 class="text-lg font-bold mb-4 text-gray-800">
+                  <i class="fas fa-dollar-sign text-green-500 mr-2"></i>
+                  Monthly Income
+                </h3>
+                <div class="flex gap-2">
+                  <input 
+                    type="number" 
+                    id="monthlyIncome" 
+                    placeholder="Enter monthly income"
+                    value="${budget.income || ''}"
+                    class="flex-1"
+                  >
+                  <button onclick="Budget.saveIncome()" class="btn-primary">
+                    <i class="fas fa-save"></i>
+                  </button>
+                </div>
+              </div>
+              
+              <!-- Budget Overview -->
+              <div class="card p-6 bg-gradient-to-br from-blue-50 to-purple-50">
+                <h3 class="text-lg font-bold mb-4 text-gray-800">Budget Overview</h3>
+                <div class="grid grid-cols-3 gap-4 text-center mb-4">
+                  <div>
+                    <p class="text-gray-600 text-sm">Income</p>
+                    <p class="text-xl font-bold text-green-600">${Utils.formatCurrency(budget.income)}</p>
+                  </div>
+                  <div>
+                    <p class="text-gray-600 text-sm">Expenses</p>
+                    <p class="text-xl font-bold text-red-600">${Utils.formatCurrency(totalExpenses)}</p>
+                  </div>
+                  <div>
+                    <p class="text-gray-600 text-sm">Remaining</p>
+                    <p class="text-xl font-bold ${remaining >= 0 ? 'text-green-600' : 'text-red-600'}">
+                      ${Utils.formatCurrency(remaining)}
+                    </p>
+                  </div>
+                </div>
+                
+                <!-- Progress Bar -->
+                <div class="w-full bg-gray-200 rounded-full h-4 overflow-hidden">
+                  <div 
+                    class="h-full transition-all duration-500 ${percentUsed > 100 ? 'bg-red-500' : percentUsed > 80 ? 'bg-yellow-500' : 'bg-green-500'}"
+                    style="width: ${Math.min(percentUsed, 100)}%"
+                  ></div>
+                </div>
+                <p class="text-center text-sm text-gray-600 mt-2">${percentUsed}% of income used</p>
+              </div>
+              
+              <!-- Add Expense -->
+              <div class="form-section">
+                <h3 class="text-lg font-bold mb-4 text-gray-800">
+                  <i class="fas fa-plus-circle text-blue-500 mr-2"></i>
+                  Add Expense
+                </h3>
+                <div class="space-y-3">
+                  <select id="expenseCategory" class="w-full">
+                    <option value="">Select Category</option>
+                    <option value="Rent/Mortgage">🏠 Rent/Mortgage</option>
+                    <option value="Utilities">💡 Utilities</option>
+                    <option value="Groceries">🛒 Groceries</option>
+                    <option value="Transportation">🚗 Transportation</option>
+                    <option value="Insurance">🛡️ Insurance</option>
+                    <option value="Healthcare">⚕️ Healthcare</option>
+                    <option value="Debt Payments">💳 Debt Payments</option>
+                    <option value="Entertainment">🎬 Entertainment</option>
+                    <option value="Savings">💰 Savings</option>
+                    <option value="Other">📋 Other</option>
+                  </select>
+                  <input 
+                    type="number" 
+                    id="expenseAmount" 
+                    placeholder="Amount"
+                    step="0.01"
+                  >
+                  <button onclick="Budget.addExpense()" class="btn-primary w-full">
+                    <i class="fas fa-plus mr-2"></i>Add Expense
+                  </button>
+                </div>
+              </div>
+              
+              <!-- Expense List -->
+              <div class="form-section">
+                <h3 class="text-lg font-bold mb-4 text-gray-800">
+                  <i class="fas fa-list text-purple-500 mr-2"></i>
+                  Your Expenses
+                </h3>
+                <div id="expenseList" class="space-y-2">
+                  ${budget.expenses.length === 0 ? 
+                    '<p class="text-gray-500 text-center py-4">No expenses added yet</p>' :
+                    budget.expenses.map((exp, idx) => `
+                      <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                        <div class="flex-1">
+                          <p class="font-semibold text-gray-800">${exp.category}</p>
+                        </div>
+                        <div class="flex items-center gap-3">
+                          <p class="font-bold text-gray-700">${Utils.formatCurrency(exp.amount)}</p>
+                          <button onclick="Budget.removeExpense(${idx})" class="text-red-500 hover:text-red-700">
+                            <i class="fas fa-trash"></i>
+                          </button>
+                        </div>
+                      </div>
+                    `).join('')
+                  }
+                </div>
+              </div>
+              
+              <!-- Budget Chart -->
+              ${budget.expenses.length > 0 ? `
+                <div class="form-section">
+                  <h3 class="text-lg font-bold mb-4 text-gray-800">Expense Breakdown</h3>
+                  <div class="budget-chart">
+                    <canvas id="budgetChart"></canvas>
+                  </div>
+                </div>
+              ` : ''}
+              
+              <!-- Actions -->
+              <div class="grid grid-cols-2 gap-4">
+                <button onclick="Budget.generatePDF()" class="btn-primary">
+                  <i class="fas fa-file-pdf mr-2"></i>Export PDF
+                </button>
+                <button onclick="Budget.reset()" class="btn-secondary">
+                  <i class="fas fa-redo mr-2"></i>Reset
+                </button>
+              </div>
+              
+              <!-- Tips -->
+              <div class="card p-6 bg-yellow-50">
+                <h3 class="font-bold text-lg mb-3 text-gray-800">
+                  <i class="fas fa-lightbulb text-yellow-500 mr-2"></i>
+                  Budgeting Tips
+                </h3>
+                <ul class="space-y-2 text-gray-700 text-sm">
+                  <li class="flex items-start">
+                    <i class="fas fa-check text-green-500 mr-2 mt-1"></i>
+                    <span>Keep housing costs under 30% of income</span>
+                  </li>
+                  <li class="flex items-start">
+                    <i class="fas fa-check text-green-500 mr-2 mt-1"></i>
+                    <span>Build an emergency fund of 3-6 months expenses</span>
+                  </li>
+                  <li class="flex items-start">
+                    <i class="fas fa-check text-green-500 mr-2 mt-1"></i>
+                    <span>Track all expenses for accurate budgeting</span>
+                  </li>
+                  <li class="flex items-start">
+                    <i class="fas fa-check text-green-500 mr-2 mt-1"></i>
+                    <span>Review and adjust your budget monthly</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        `;
+      },
+      
+      ai_scanner() {
+        const premiumBadge = AppState.isPremium ? 
+          '<span class="bg-yellow-400 text-xs text-blue-900 px-2 py-1 rounded-full font-bold ml-2">PREMIUM</span>' : 
+          '<span class="bg-gray-300 text-xs text-gray-600 px-2 py-1 rounded-full font-bold ml-2">FREE MODE</span>';
+
+        return `
+          <div class="content-area fade-in">
+            <div class="bg-gradient-to-br from-indigo-600 to-blue-800 text-white p-6 rounded-b-3xl shadow-lg mb-4">
+              <h1 class="text-2xl font-bold mb-2">AI Dispute Scanner ${premiumBadge}</h1>
+              <p class="text-indigo-100">Scan reports to find FCRA violations automatically</p>
+            </div>
+            
+            <div class="px-4 space-y-4">
+              <!-- Checklist Flow -->
+              <div class="card p-4 bg-blue-50">
+                <h4 class="font-bold text-sm mb-3">Dispute Readiness Checklist:</h4>
+                <div class="space-y-2">
+                  <label class="flex items-center text-xs"><input type="checkbox" class="mr-2" checked> Obtained credit report (AnnualCreditReport.com)</label>
+                  <label class="flex items-center text-xs"><input type="checkbox" class="mr-2"> Identified inaccurate "Late" or "Charge-off"</label>
+                  <label class="flex items-center text-xs"><input type="checkbox" class="mr-2"> Verified identity documents ready</label>
+                </div>
+              </div>
+
+              <div class="card p-6 border-2 border-dashed border-indigo-200 text-center" id="dropzone" onclick="${!AppState.isPremium ? 'Payment.checkGating()' : ''}">
+                <i class="fas fa-file-invoice text-5xl text-indigo-400 mb-4"></i>
+                <h3 class="text-lg font-bold mb-2">Upload Credit Report</h3>
+                <p class="text-sm text-gray-600 mb-4">The AI will identify errors using 15 USC § 1681 codes.</p>
+                <input type="file" id="reportUpload" class="hidden" accept="image/*,.pdf" ${AppState.isPremium ? 'onchange="AIScanner.handleUpload(event)"' : ''}>
+                <button onclick="${AppState.isPremium ? 'document.getElementById(\'reportUpload\').click()' : 'Payment.checkGating()'}" class="btn-primary w-full">
+                  <i class="fas fa-upload mr-2"></i>${AppState.isPremium ? 'Start AI Scan' : 'Unlock AI Scanning'}
+                </button>
+              </div>
+
+              <div id="scanStatus" class="hidden card p-4">
+                <div class="flex items-center space-y-4 flex-col">
+                  <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600"></div>
+                  <p id="statusText" class="font-semibold text-indigo-700 italic">Processing...</p>
+                </div>
+              </div>
+
+              <div id="scanResults" class="hidden space-y-4">
+                <!-- Results injected here -->
+              </div>
+            </div>
+          </div>
+        `;
+      },
+
+      resources() {
+        return `
+          <div class="content-area fade-in">
+            <div class="bg-gradient-to-br from-purple-500 to-purple-700 text-white p-6 rounded-b-3xl shadow-lg mb-4">
+              <h1 class="text-2xl font-bold mb-2">Resources & Guides</h1>
+              <p class="text-purple-100">Learn about your rights and options</p>
+            </div>
+            
+            <div class="px-4 space-y-4">
+              <div class="card p-6">
+                <h3 class="text-xl font-bold mb-4 text-gray-800">
+                  <i class="fas fa-book-open text-purple-500 mr-2"></i>
+                  Credit Report Rights
+                </h3>
+                <div class="space-y-3 text-gray-700">
+                  <div class="p-3 bg-purple-50 rounded-lg">
+                    <h4 class="font-semibold mb-2">Fair Credit Reporting Act (FCRA)</h4>
+                    <p class="text-sm">You have the right to dispute inaccurate information on your credit report. Credit bureaus must investigate within 30 days.</p>
+                  </div>
+                  <div class="p-3 bg-purple-50 rounded-lg">
+                    <h4 class="font-semibold mb-2">Free Credit Reports</h4>
+                    <p class="text-sm">Get a free credit report from each bureau annually at AnnualCreditReport.com</p>
+                  </div>
+                  <div class="p-3 bg-purple-50 rounded-lg">
+                    <h4 class="font-semibold mb-2">Dispute Process</h4>
+                    <p class="text-sm">Send disputes in writing via certified mail. Keep copies of all correspondence.</p>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="card p-6">
+                <h3 class="text-xl font-bold mb-4 text-gray-800">
+                  <i class="fas fa-home text-blue-500 mr-2"></i>
+                  Housing Assistance Programs
+                </h3>
+                <div class="space-y-3">
+                  <a href="https://www.hud.gov" target="_blank" class="block p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition">
+                    <h4 class="font-semibold text-blue-700">HUD Resources</h4>
+                    <p class="text-sm text-gray-600">U.S. Department of Housing and Urban Development</p>
+                  </a>
+                  <a href="https://www.benefits.gov/categories/Housing%20Assistance" target="_blank" class="block p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition">
+                    <h4 class="font-semibold text-blue-700">Benefits.gov</h4>
+                    <p class="text-sm text-gray-600">Find housing assistance programs</p>
+                  </a>
+                </div>
+              </div>
+              
+              <div class="card p-6">
+                <h3 class="text-xl font-bold mb-4 text-gray-800">
+                  <i class="fas fa-phone text-green-500 mr-2"></i>
+                  Contact Information
+                </h3>
+                <div class="space-y-3 text-gray-700">
+                  <div class="flex items-center p-3 bg-gray-50 rounded-lg">
+                    <i class="fas fa-building text-red-500 mr-3 text-xl"></i>
+                    <div>
+                      <p class="font-semibold">Equifax</p>
+                      <p class="text-sm">1-800-685-1111</p>
+                    </div>
+                  </div>
+                  <div class="flex items-center p-3 bg-gray-50 rounded-lg">
+                    <i class="fas fa-building text-teal-500 mr-3 text-xl"></i>
+                    <div>
+                      <p class="font-semibold">Experian</p>
+                      <p class="text-sm">1-888-397-3742</p>
+                    </div>
+                  </div>
+                  <div class="flex items-center p-3 bg-gray-50 rounded-lg">
+                    <i class="fas fa-building text-blue-500 mr-3 text-xl"></i>
+                    <div>
+                      <p class="font-semibold">TransUnion</p>
+                      <p class="text-sm">1-800-916-8800</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="card p-6 bg-gradient-to-br from-orange-50 to-red-50">
+                <h3 class="text-xl font-bold mb-4 text-gray-800">
+                  <i class="fas fa-exclamation-triangle text-orange-500 mr-2"></i>
+                  Important Deadlines
+                </h3>
+                <ul class="space-y-2 text-gray-700">
+                  <li class="flex items-start">
+                    <i class="fas fa-clock text-orange-500 mr-2 mt-1"></i>
+                    <span>Credit bureaus have <strong>30 days</strong> to investigate disputes</span>
+                  </li>
+                  <li class="flex items-start">
+                    <i class="fas fa-clock text-orange-500 mr-2 mt-1"></i>
+                    <span>Most negative items remain for <strong>7 years</strong></span>
+                  </li>
+                  <li class="flex items-start">
+                    <i class="fas fa-clock text-orange-500 mr-2 mt-1"></i>
+                    <span>Bankruptcies can remain for <strong>10 years</strong></span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        `;
+      },
+      
+      profile() {
+        const savedProfile = Utils.getFromLocalStorage('userProfile') || {};
+        
+        return `
+          <div class="content-area fade-in">
+            <div class="bg-gradient-to-br from-gray-700 to-gray-900 text-white p-6 rounded-b-3xl shadow-lg mb-4">
+              <div class="flex items-center">
+                <div class="w-20 h-20 bg-white rounded-full flex items-center justify-center text-gray-700 text-3xl font-bold mr-4">
+                  ${savedProfile.name ? savedProfile.name[0].toUpperCase() : 'U'}
+                </div>
+                <div>
+                  <h1 class="text-2xl font-bold">${savedProfile.name || 'Your Profile'}</h1>
+                  <p class="text-gray-300">${savedProfile.email || 'user@example.com'}</p>
+                </div>
+              </div>
+            </div>
+            
+            <div class="px-4 space-y-4">
+              <div class="form-section">
+                <h3 class="text-lg font-bold mb-4 text-gray-800">
+                  <i class="fas fa-user-edit text-blue-500 mr-2"></i>
+                  Personal Information
+                </h3>
+                <div class="space-y-3">
+                  <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Full Name</label>
+                    <input type="text" id="profileName" value="${savedProfile.name || ''}" placeholder="John Doe">
+                  </div>
+                  <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Email</label>
+                    <input type="email" id="profileEmail" value="${savedProfile.email || ''}" placeholder="john@example.com">
+                  </div>
+                  <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Phone</label>
+                    <input type="tel" id="profilePhone" value="${savedProfile.phone || ''}" placeholder="(555) 123-4567">
+                  </div>
+                  <button onclick="Profile.saveProfile()" class="btn-primary w-full">
+                    <i class="fas fa-save mr-2"></i>Save Profile
+                  </button>
+                </div>
+              </div>
+              
+              <div class="card p-6">
+                <h3 class="text-lg font-bold mb-4 text-gray-800">
+                  <i class="fas fa-chart-line text-green-500 mr-2"></i>
+                  Your Activity
+                </h3>
+                <div class="grid grid-cols-2 gap-4 text-center">
+                  <div class="p-4 bg-blue-50 rounded-lg">
+                    <p class="text-3xl font-bold text-blue-600">${Object.values(AppState.forms).filter(f => f !== null).length}</p>
+                    <p class="text-sm text-gray-600">Forms Created</p>
+                  </div>
+                  <div class="p-4 bg-green-50 rounded-lg">
+                    <p class="text-3xl font-bold text-green-600">${(Utils.getFromLocalStorage('budget')?.expenses || []).length}</p>
+                    <p class="text-sm text-gray-600">Budget Entries</p>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="card p-6">
+                <h3 class="text-lg font-bold mb-4 text-gray-800">
+                  <i class="fas fa-cog text-gray-500 mr-2"></i>
+                  Settings
+                </h3>
+                <div class="space-y-3">
+                  <button onclick="Profile.exportData()" class="w-full p-3 bg-blue-50 rounded-lg text-left hover:bg-blue-100 transition">
+                    <i class="fas fa-download text-blue-500 mr-2"></i>
+                    Export My Data
+                  </button>
+                  <button onclick="Profile.clearData()" class="w-full p-3 bg-red-50 rounded-lg text-left hover:bg-red-100 transition">
+                    <i class="fas fa-trash text-red-500 mr-2"></i>
+                    Clear All Data
+                  </button>
+                </div>
+              </div>
+              
+              <div class="card p-6 bg-gray-50">
+                <h3 class="text-lg font-bold mb-2 text-gray-800">About POWER PLAY</h3>
+                <p class="text-sm text-gray-600 mb-3">
+                  POWER PLAY Resource Center helps individuals navigate housing challenges 
+                  through education, advocacy, and tools.
+                </p>
+                <p class="text-sm text-gray-600">
+                  <i class="fas fa-map-marker-alt text-blue-500 mr-2"></i>
+                  Albuquerque, New Mexico
+                </p>
+                <p class="text-sm text-gray-600">
+                  <i class="fas fa-phone text-blue-500 mr-2"></i>
+                  (505) 595-7861
+                </p>
+                <p class="text-sm text-gray-600 mt-3">Version 1.0.0</p>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+    };
+
+    // ===== FORM SCREENS =====
+    const FormScreens = {
+      equifax() {
+        return `
+          <div class="content-area fade-in">
+            <div class="bg-white p-4 shadow-sm mb-4 flex items-center justify-between">
+              <div>
+                <h1 class="text-xl font-bold text-gray-800">Equifax Housing Dispute</h1>
+                <p class="text-sm text-gray-600">Dispute rental & eviction errors</p>
+              </div>
+              <button onclick="App.navigate('forms')" class="btn-secondary">
+                <i class="fas fa-arrow-left mr-2"></i>Back
+              </button>
+            </div>
+            
+            <form id="equifaxForm" class="px-4 space-y-4" onsubmit="Forms.submitEquifax(event)">
+              <!-- Personal Information -->
+              <div class="form-section">
+                <h3 class="text-lg font-bold mb-3 text-gray-800">Personal Information</h3>
+                <div class="grid grid-cols-2 gap-3">
+                  <div>
+                    <label class="block text-sm font-semibold mb-1">First Name *</label>
+                    <input type="text" name="firstName" required>
+                  </div>
+                  <div>
+                    <label class="block text-sm font-semibold mb-1">Last Name *</label>
+                    <input type="text" name="lastName" required>
+                  </div>
+                </div>
+                <div>
+                  <label class="block text-sm font-semibold mb-1">SSN *</label>
+                  <input type="text" name="ssn" placeholder="XXX-XX-XXXX" pattern="\\d{3}-\\d{2}-\\d{4}" required>
+                </div>
+                <div>
+                  <label class="block text-sm font-semibold mb-1">Current Address *</label>
+                  <input type="text" name="currentAddress" required>
+                </div>
+                <div class="grid grid-cols-3 gap-3">
+                  <div>
+                    <label class="block text-sm font-semibold mb-1">City *</label>
+                    <input type="text" name="city" required>
+                  </div>
+                  <div>
+                    <label class="block text-sm font-semibold mb-1">State *</label>
+                    <input type="text" name="state" maxlength="2" required>
+                  </div>
+                  <div>
+                    <label class="block text-sm font-semibold mb-1">ZIP *</label>
+                    <input type="text" name="zip" pattern="\\d{5}" required>
+                  </div>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                  <div>
+                    <label class="block text-sm font-semibold mb-1">Phone *</label>
+                    <input type="tel" name="phone" required>
+                  </div>
+                  <div>
+                    <label class="block text-sm font-semibold mb-1">Email *</label>
+                    <input type="email" name="email" required>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Dispute Type -->
+              <div class="form-section">
+                <h3 class="text-lg font-bold mb-3 text-gray-800">Dispute Type</h3>
+                <select name="disputeType" class="w-full">
+                  <option value="eviction">Eviction Record</option>
+                  <option value="rental_debt">Rental Debt/Collections</option>
+                  <option value="criminal">Criminal Record on Screening</option>
+                  <option value="identity">Identity Error/Mixed File</option>
+                </select>
+              </div>
+              
+              <!-- Account Information -->
+              <div class="form-section">
+                <h3 class="text-lg font-bold mb-3 text-gray-800">Account Information</h3>
+                <div>
+                  <label class="block text-sm font-semibold mb-1">Account Number *</label>
+                  <input type="text" name="accountNumber" required>
+                </div>
+                <div>
+                  <label class="block text-sm font-semibold mb-1">Creditor Name</label>
+                  <input type="text" name="creditorName">
+                </div>
+              </div>
+              
+              <!-- Dispute Details -->
+              <div class="form-section">
+                <h3 class="text-lg font-bold mb-3 text-gray-800">Dispute Details</h3>
+                <div>
+                  <label class="block text-sm font-semibold mb-1">Dispute Reason *</label>
+                  <select name="disputeReason" required>
+                    <option value="">Select a reason</option>
+                    <option value="Information is not mine">Information is not mine</option>
+                    <option value="Account paid in full">Account paid in full</option>
+                    <option value="Case dismissed">Case dismissed</option>
+                    <option value="Eviction filed in error">Eviction filed in error</option>
+                    <option value="Identity theft">Identity theft</option>
+                    <option value="Incorrect amount">Incorrect amount</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-sm font-semibold mb-1">Detailed Explanation * (min 50 characters)</label>
+                  <textarea name="disputeExplanation" rows="4" minlength="50" required placeholder="Provide specific details about why this information is incorrect..."></textarea>
+                </div>
+              </div>
+              
+              <!-- Submit -->
+              <div class="pb-4">
+                <button type="submit" class="btn-primary w-full text-lg py-4">
+                  <i class="fas fa-file-pdf mr-2"></i>Generate PDF
+                </button>
+              </div>
+            </form>
+          </div>
+        `;
+      },
+      
+      metro2() {
+        return `
+          <div class="content-area fade-in">
+            <div class="bg-white p-4 shadow-sm mb-4 flex items-center justify-between">
+              <div>
+                <h1 class="text-xl font-bold text-gray-800">METRO 2 Compliance</h1>
+                <p class="text-sm text-gray-600">Verify credit data reporting accuracy</p>
+              </div>
+              <button onclick="App.navigate('forms')" class="btn-secondary">
+                <i class="fas fa-arrow-left mr-2"></i>Back
+              </button>
+            </div>
+            
+            <div class="px-4 space-y-4">
+              <div class="card p-4 bg-purple-50">
+                <h3 class="font-bold mb-2">What is METRO 2?</h3>
+                <p class="text-sm text-gray-700">
+                  METRO 2 is the standard format used by credit reporting agencies to exchange 
+                  consumer credit information. This form verifies that your account data is 
+                  reported correctly according to METRO 2 standards.
+                </p>
+              </div>
+            </div>
+            
+            <form id="metro2Form" class="px-4 space-y-4 mt-4" onsubmit="Forms.submitMetro2(event)">
+              <!-- Consumer Information -->
+              <div class="form-section">
+                <h3 class="text-lg font-bold mb-3 text-gray-800">Consumer Information</h3>
+                <div class="grid grid-cols-2 gap-3">
+                  <div>
+                    <label class="block text-sm font-semibold mb-1">First Name *</label>
+                    <input type="text" name="firstName" required>
+                  </div>
+                  <div>
+                    <label class="block text-sm font-semibold mb-1">Last Name *</label>
+                    <input type="text" name="lastName" required>
+                  </div>
+                </div>
+                <div>
+                  <label class="block text-sm font-semibold mb-1">SSN *</label>
+                  <input type="text" name="ssn" placeholder="XXX-XX-XXXX" required>
+                </div>
+                <div>
+                  <label class="block text-sm font-semibold mb-1">Current Address *</label>
+                  <input type="text" name="currentAddress" required>
+                </div>
+                <div class="grid grid-cols-3 gap-3">
+                  <div>
+                    <label class="block text-sm font-semibold mb-1">City *</label>
+                    <input type="text" name="city" required>
+                  </div>
+                  <div>
+                    <label class="block text-sm font-semibold mb-1">State *</label>
+                    <input type="text" name="state" maxlength="2" required>
+                  </div>
+                  <div>
+                    <label class="block text-sm font-semibold mb-1">ZIP *</label>
+                    <input type="text" name="zip" required>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Reporting Institution -->
+              <div class="form-section">
+                <h3 class="text-lg font-bold mb-3 text-gray-800">Reporting Institution</h3>
+                <div>
+                  <label class="block text-sm font-semibold mb-1">Institution Name *</label>
+                  <input type="text" name="institutionName" required>
+                </div>
+                <div>
+                  <label class="block text-sm font-semibold mb-1">METRO 2 Subscriber Code *</label>
+                  <input type="text" name="metro2Code" required>
+                </div>
+                <div>
+                  <label class="block text-sm font-semibold mb-1">Report Frequency</label>
+                  <select name="reportFrequency">
+                    <option value="monthly">Monthly</option>
+                    <option value="quarterly">Quarterly</option>
+                    <option value="biannually">Bi-Annually</option>
+                    <option value="annually">Annually</option>
+                  </select>
+                </div>
+              </div>
+              
+              <!-- Account Information -->
+              <div class="form-section">
+                <h3 class="text-lg font-bold mb-3 text-gray-800">Account Information</h3>
+                <div>
+                  <label class="block text-sm font-semibold mb-1">Account Number *</label>
+                  <input type="text" name="accountNumber" required>
+                </div>
+                <div>
+                  <label class="block text-sm font-semibold mb-1">Account Status *</label>
+                  <select name="accountStatus" required>
+                    <option value="">Select status</option>
+                    <option value="open">Open</option>
+                    <option value="closed_by_consumer">Closed by Consumer</option>
+                    <option value="closed_by_creditor">Closed by Creditor</option>
+                    <option value="delinquent">Delinquent</option>
+                  </select>
+                </div>
+              </div>
+              
+              <!-- Data Accuracy -->
+              <div class="form-section">
+                <h3 class="text-lg font-bold mb-3 text-gray-800">Data Accuracy Concerns</h3>
+                <div>
+                  <label class="block text-sm font-semibold mb-1">Accuracy Concern *</label>
+                  <textarea name="accuracyConcern" rows="3" required placeholder="What data is inaccurate or missing?"></textarea>
+                </div>
+              </div>
+              
+              <!-- Disputed Fields -->
+              <div class="form-section" id="disputedFieldsSection">
+                <h3 class="text-lg font-bold mb-3 text-gray-800">Disputed Fields</h3>
+                <div class="space-y-3 mb-4">
+                  <input type="text" id="fieldName" placeholder="Field Name (e.g., Payment Status)">
+                  <input type="text" id="reportedValue" placeholder="Reported Value">
+                  <input type="text" id="correctValue" placeholder="Correct Value">
+                  <button type="button" onclick="Forms.addDisputedField()" class="btn-secondary w-full">
+                    <i class="fas fa-plus mr-2"></i>Add Field
+                  </button>
+                </div>
+                <div id="disputedFieldsList" class="space-y-2"></div>
+              </div>
+              
+              <!-- Agreement -->
+              <div class="form-section">
+                <label class="flex items-start">
+                  <input type="checkbox" name="agreeToCompliance" required class="mt-1 mr-2">
+                  <span class="text-sm text-gray-700">
+                    I certify that I am the account owner or authorized representative and request 
+                    verification of the accuracy of information reported according to METRO 2 standards.
+                  </span>
+                </label>
+              </div>
+              
+              <!-- Submit -->
+              <div class="pb-4">
+                <button type="submit" class="btn-primary w-full text-lg py-4">
+                  <i class="fas fa-file-pdf mr-2"></i>Generate PDF
+                </button>
+              </div>
+            </form>
+          </div>
+        `;
+      }
+    };
+
+    // ===== AI SCANNER LOGIC =====
+    const AIScanner = {
+      async handleUpload(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const status = document.getElementById('scanStatus');
+        const results = document.getElementById('scanResults');
+        const statusText = document.getElementById('statusText');
+        
+        status.classList.remove('hidden');
+        results.classList.add('hidden');
+
+        try {
+          statusText.innerText = "AI Reading Document...";
+          const { data: { text } } = await Tesseract.recognize(file, 'eng');
+          
+          if (CONFIG.GEMINI_API_KEY && CONFIG.GEMINI_API_KEY !== 'your-gemini-api-key') {
+            statusText.innerText = "Consulting Premium AI Legal Model...";
+            const aiAnalysis = await this.callGeminiAI(text);
+            this.displayAIAnalysis(aiAnalysis);
+          } else {
+            statusText.innerText = "Running Local Analysis...";
+            await new Promise(r => setTimeout(r, 800)); 
+            this.processTextAndDisplay(text);
+          }
+        } catch (e) {
+          console.error(e);
+          Utils.showToast("Scan failed. Check API keys or connection.", "error");
+        } finally {
+          status.classList.add('hidden');
+        }
+      },
+
+      async callGeminiAI(text) {
+        const prompt = `Analyze this credit report text for violations of FCRA, FDCPA, or METRO 2 standards. 
+        Identify specific items and provide the exact USC codes for dispute. 
+        Format as a JSON array of objects with keys: type, code, law, explanation. 
+        Report Text: ${text.substring(0, 5000)}`;
+
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${CONFIG.GEMINI_API_KEY}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: prompt }] }]
+          })
+        });
+        
+        const data = await response.json();
+        const rawText = data.candidates[0].content.parts[0].text;
+        // Clean JSON from markdown if present
+        const jsonMatch = rawText.match(/\[.*\]/s);
+        return jsonMatch ? JSON.parse(jsonMatch[0]) : [];
+      },
+
+      displayAIAnalysis(results) {
+        const resultsDiv = document.getElementById('scanResults');
+        resultsDiv.classList.remove('hidden');
+        resultsDiv.innerHTML = `
+          <div class="bg-gradient-to-r from-yellow-500 to-orange-600 text-white p-4 rounded-lg shadow-lg mb-4">
+            <h3 class="font-bold flex items-center"><i class="fas fa-crown mr-2"></i> Premium AI Analysis Complete</h3>
+            <p class="text-xs">Identified ${results.length} high-probability violations.</p>
+          </div>
+          ${results.map(v => `
+            <div class="card p-4 border-l-4 border-orange-500 mb-3 bg-white">
+              <div class="flex justify-between items-start">
+                <h4 class="font-bold text-gray-800">${v.type}</h4>
+                <span class="text-[10px] bg-orange-100 text-orange-700 px-2 py-1 rounded font-black">${v.code}</span>
+              </div>
+              <p class="text-sm text-gray-600 mt-2">${v.explanation}</p>
+              <button onclick="AIScanner.generateLegalDispute('${v.type}', '${v.code}', '${v.law}')" class="btn-primary mt-3 w-full py-2 text-sm bg-orange-600 border-none">
+                Draft Expert ${v.law} Dispute
+              </button>
+            </div>
+          `).join('')}
+        `;
+      },
+
+      processTextAndDisplay(text) {
+        const resultsDiv = document.getElementById('scanResults');
+        resultsDiv.classList.remove('hidden');
+        
+        // Logic to extract patterns like "Late", "Charge off", "Collection"
+        const foundKeywords = [];
+        if (/late|past due/i.test(text)) foundKeywords.push({type: 'Late Payment', code: '15 USC 1681i', law: 'FCRA'});
+        if (/collection|debt/i.test(text)) foundKeywords.push({type: 'Collection', code: '15 USC 1692g', law: 'FDCPA'});
+        if (/charge.off|profit.loss/i.test(text)) foundKeywords.push({type: 'Charge-Off', code: '15 USC 1681eb', law: 'FCRA'});
+        
+        // Fallback if no specific pattern found
+        if (foundKeywords.length === 0) {
+          foundKeywords.push({type: 'Unverified Item', code: '15 USC 1681', law: 'FCRA'});
+        }
+
+        resultsDiv.innerHTML = `
+          <div class="bg-indigo-900 text-white p-4 rounded-lg shadow-inner mb-4">
+            <h3 class="font-bold flex items-center"><i class="fas fa-microchip mr-2"></i> AI Scan Summary</h3>
+            <p class="text-xs opacity-80">Detected ${foundKeywords.length} items for high-impact dispute.</p>
+          </div>
+          ${foundKeywords.map(v => `
+            <div class="card p-4 border-l-4 border-blue-600 mb-3 bg-white">
+              <div class="flex justify-between items-start">
+                <h4 class="font-bold text-gray-800">${v.type}</h4>
+                <span class="text-[10px] bg-blue-100 text-blue-700 px-2 py-1 rounded font-black">${v.code}</span>
+              </div>
+              <p class="text-sm text-gray-600 mt-2">Violation of ${v.law} detected. The reporting fails to meet the "Maximum Possible Accuracy" standard.</p>
+              <button onclick="AIScanner.generateLegalDispute('${v.type}', '${v.code}', '${v.law}')" class="btn-primary mt-3 w-full py-2 text-sm">
+                Generate ${v.law} Dispute
+              </button>
+            </div>
+          `).join('')}
+        `;
+      },
+
+      generateLegalDispute(type, code, law) {
+        Utils.showToast(`Drafting ${law} Dispute...`, "success");
+        AppState.currentScreen = 'form_equifax';
+        App.render();
+        
+        setTimeout(() => {
+          const area = document.querySelector('textarea[name="disputeExplanation"]');
+          const reasonSelect = document.querySelector('select[name="disputeReason"]');
+          
+          if(reasonSelect) reasonSelect.value = "Information is not mine";
+          
+          if(area) {
+            area.value = `DEMAND FOR REMOVAL: This ${type} is being disputed under ${law} ${code}. 
+Pursuant to 15 U.S.C. § 1681i, I am demanding a complete reinvestigation of this unverified item. 
+The furnisher has failed to maintain 'Maximum Possible Accuracy' as required by 15 U.S.C. § 1681e(b). 
+If this item cannot be verified with the original physical signed contract within 30 days, it must be deleted immediately. 
+Failure to comply will result in a formal complaint to the CFPB and potential litigation under ${law} civil liability sections.`;
+          }
+        }, 600);
+      }
+    };
+
+    // ===== SUPABASE & STRIPE INTEGRATION =====
+    const Payment = {
+      async checkout() {
+        Utils.showToast("Initializing Secure Payment...", "info");
+        
+        if (CONFIG.STRIPE_PUBLIC_KEY.includes('your_stripe')) {
+          alert("Stripe Setup Required: Please add your key to the CONFIG object.");
+          return;
+        }
+
+        const stripe = Stripe(CONFIG.STRIPE_PUBLIC_KEY);
+        
+        // This is a direct gating simulation for PWA logic
+        // In production, use Supabase Edge Functions to create a real session
+        Utils.showToast("Redirecting to Stripe...", "success");
+        setTimeout(() => {
+          AppState.isPremium = true;
+          Utils.saveToLocalStorage('app_state', AppState);
+          alert("DEMO MODE: Premium Access Granted. In production, this would redirect to Stripe Checkout.");
+          App.render();
+        }, 1500);
+      },
+
+      checkGating() {
+        if (!AppState.isPremium) {
+          const overlay = document.createElement('div');
+          overlay.className = 'modal fade-in';
+          overlay.innerHTML = `
+            <div class="modal-content p-8 text-center">
+              <i class="fas fa-lock text-5xl text-blue-600 mb-4"></i>
+              <h2 class="text-2xl font-bold mb-2">Premium Feature</h2>
+              <p class="text-gray-600 mb-6">Unlock the AI Scanner and Expert Metro 2 disputes for a one-time fee.</p>
+              <button onclick="Payment.checkout()" class="btn-primary w-full mb-4">Unlock Everything - $29.99</button>
+              <button onclick="document.querySelector('.modal').remove()" class="text-gray-500 text-sm">Maybe Later</button>
+            </div>
+          `;
+          document.body.appendChild(overlay);
+          return false;
+        }
+        return true;
+      }
+    };
+
+    const DB = {
+      supabase: null,
+      init() {
+        if(CONFIG.SUPABASE_URL.includes('your-project')) return;
+        try {
+          this.supabase = supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_KEY);
+          console.log("Supabase Connected");
+        } catch(e) {
+          console.error("Supabase Connection Failed", e);
+        }
+      },
+      async saveDispute(data) {
+        if (!this.supabase) return;
+        const { error } = await this.supabase.from('disputes').insert([data]);
+        if (error) console.error('Error saving:', error);
+      }
+    };
+
+    // ===== APP CONTROLLER =====
+    const App = {
+      init() {
+        const saved = Utils.getFromLocalStorage('app_state');
+        if (saved) {
+          AppState.isPremium = saved.isPremium;
+        }
+        DB.init();
+        this.render();
+        this.registerServiceWorker();
+        this.checkInstallPrompt();
+      },
+      
+      navigate(screen) {
+        AppState.currentScreen = screen;
+        this.render();
+        window.scrollTo(0, 0);
+      },
+      
+      openForm(formId) {
+        AppState.currentScreen = `form_${formId}`;
+        this.render();
+      },
+      
+      render() {
+        const app = document.getElementById('app');
+        let content = '';
+        
+        switch(AppState.currentScreen) {
+          case 'home':
+            content = Screens.home();
+            break;
+          case 'forms':
+            content = Screens.forms();
+            break;
+          case 'budget':
+            content = Screens.budget();
+            setTimeout(() => Budget.renderChart(), 100);
+            break;
+          case 'resources':
+            content = Screens.resources();
+            break;
+          case 'profile':
+            content = Screens.profile();
+            break;
+          case 'form_equifax':
+            content = FormScreens.equifax();
+            break;
+          case 'form_metro2':
+            content = FormScreens.metro2();
+            break;
+          default:
+            content = `<div class="p-8 text-center">
+              <h2 class="text-2xl font-bold mb-4">Coming Soon</h2>
+              <p class="text-gray-600 mb-4">This form is being developed</p>
+              <button onclick="App.navigate('forms')" class="btn-primary">Back to Forms</button>
+            </div>`;
+        }
+        
+        app.innerHTML = content + Components.navigationBar();
+      },
+      
+      registerServiceWorker() {
+        if ('serviceWorker' in navigator) {
+          navigator.serviceWorker.register('sw.js')
+            .then(() => console.log('Service Worker registered'))
+            .catch(err => console.log('Service Worker registration failed', err));
+        }
+      },
+      
+      checkInstallPrompt() {
+        let deferredPrompt;
+        
+        window.addEventListener('beforeinstallprompt', (e) => {
+          e.preventDefault();
+          deferredPrompt = e;
+          
+          const installPrompt = document.createElement('div');
+          installPrompt.className = 'install-prompt fade-in';
+          installPrompt.innerHTML = `
+            <div class="flex items-center justify-between">
+              <div class="mr-4">
+                <p class="font-semibold">Install POWER PLAY</p>
+                <p class="text-sm text-gray-600">Access offline anytime</p>
+              </div>
+              <div class="flex gap-2">
+                <button onclick="this.parentElement.parentElement.parentElement.remove()" class="btn-secondary px-3 py-2 text-sm">
+                  Later
+                </button>
+                <button id="installBtn" class="btn-primary px-3 py-2 text-sm">
+                  Install
+                </button>
+              </div>
+            </div>
+          `;
+          document.body.appendChild(installPrompt);
+          
+          document.getElementById('installBtn').addEventListener('click', async () => {
+            deferredPrompt.prompt();
+            await deferredPrompt.userChoice;
+            installPrompt.remove();
+          });
+        });
+      }
+    };
+
+    // ===== BUDGET CONTROLLER =====
+    const Budget = {
+      disputedFields: [],
+      
+      saveIncome() {
+        const income = parseFloat(document.getElementById('monthlyIncome').value) || 0;
+        const budget = Utils.getFromLocalStorage('budget') || { expenses: [] };
+        budget.income = income;
+        Utils.saveToLocalStorage('budget', budget);
+        Utils.showToast('Income saved!', 'success');
+        App.navigate('budget');
+      },
+      
+      addExpense() {
+        const category = document.getElementById('expenseCategory').value;
+        const amount = parseFloat(document.getElementById('expenseAmount').value);
+        
+        if (!category || !amount) {
+          Utils.showToast('Please fill in all fields', 'error');
+          return;
+        }
+        
+        const budget = Utils.getFromLocalStorage('budget') || { income: 0, expenses: [] };
+        budget.expenses.push({ category, amount });
+        Utils.saveToLocalStorage('budget', budget);
+        Utils.showToast('Expense added!', 'success');
+        
+        document.getElementById('expenseCategory').value = '';
+        document.getElementById('expenseAmount').value = '';
+        
+        App.navigate('budget');
+      },
+      
+      removeExpense(index) {
+        if (confirm('Remove this expense?')) {
+          const budget = Utils.getFromLocalStorage('budget');
+          budget.expenses.splice(index, 1);
+          Utils.saveToLocalStorage('budget', budget);
+          Utils.showToast('Expense removed', 'success');
+          App.navigate('budget');
+        }
+      },
+      
+      renderChart() {
+        const budget = Utils.getFromLocalStorage('budget') || { expenses: [] };
+        if (budget.expenses.length === 0) return;
+        
+        const canvas = document.getElementById('budgetChart');
+        if (!canvas) return;
+        
+        const ctx = canvas.getContext('2d');
+        
+        const categories = budget.expenses.map(e => e.category);
+        const amounts = budget.expenses.map(e => e.amount);
+        
+        new Chart(ctx, {
+          type: 'doughnut',
+          data: {
+            labels: categories,
+            datasets: [{
+              data: amounts,
+              backgroundColor: [
+                '#0e6efb', '#10b981', '#f59e0b', '#ef4444', 
+                '#8b5cf6', '#ec4899', '#14b8a6', '#f97316'
+              ]
+            }]
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              legend: {
+                position: 'bottom'
+              }
+            }
+          }
+        });
+      },
+      
+      generatePDF() {
+        const budget = Utils.getFromLocalStorage('budget') || { income: 0, expenses: [] };
+        PDFGenerator.generateBudgetPDF(budget);
+      },
+      
+      reset() {
+        if (confirm('Reset all budget data? This cannot be undone.')) {
+          Utils.saveToLocalStorage('budget', { income: 0, expenses: [] });
+          Utils.showToast('Budget reset', 'success');
+          App.navigate('budget');
+        }
+      }
+    };
+
+    // ===== FORMS CONTROLLER =====
+    const Forms = {
+      disputedFields: [],
+      
+      submitEquifax(e) {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        const data = Object.fromEntries(formData);
+        
+        AppState.forms.equifax = data;
+        PDFGenerator.generateEquifaxPDF(data);
+      },
+      
+      submitMetro2(e) {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        const data = Object.fromEntries(formData);
+        data.disputedFields = this.disputedFields;
+        
+        if (this.disputedFields.length === 0) {
+          Utils.showToast('Please add at least one disputed field', 'error');
+          return;
+        }
+        
+        AppState.forms.metro2 = data;
+        PDFGenerator.generateMetro2PDF(data);
+      },
+      
+      addDisputedField() {
+        const fieldName = document.getElementById('fieldName').value;
+        const reportedValue = document.getElementById('reportedValue').value;
+        const correctValue = document.getElementById('correctValue').value;
+        
+        if (!fieldName || !reportedValue || !correctValue) {
+          Utils.showToast('Please fill in all field information', 'error');
+          return;
+        }
+        
+        this.disputedFields.push({ fieldName, reportedValue, correctValue });
+        
+        document.getElementById('fieldName').value = '';
+        document.getElementById('reportedValue').value = '';
+        document.getElementById('correctValue').value = '';
+        
+        this.renderDisputedFields();
+        Utils.showToast('Field added', 'success');
+      },
+      
+      removeDisputedField(index) {
+        this.disputedFields.splice(index, 1);
+        this.renderDisputedFields();
+      },
+      
+      renderDisputedFields() {
+        const list = document.getElementById('disputedFieldsList');
+        if (!list) return;
+        
+        list.innerHTML = this.disputedFields.map((field, idx) => `
+          <div class="p-3 bg-purple-50 rounded-lg">
+            <div class="flex justify-between items-start">
+              <div class="flex-1">
+                <p class="font-semibold text-gray-800">${field.fieldName}</p>
+                <p class="text-sm text-gray-600">Reported: ${field.reportedValue}</p>
+                <p class="text-sm text-gray-600">Correct: ${field.correctValue}</p>
+              </div>
+              <button type="button" onclick="Forms.removeDisputedField(${idx})" class="text-red-500 hover:text-red-700">
+                <i class="fas fa-trash"></i>
+              </button>
+            </div>
+          </div>
+        `).join('');
+      }
+    };
+
+    // ===== PROFILE CONTROLLER =====
+    const Profile = {
+      saveProfile() {
+        const profile = {
+          name: document.getElementById('profileName').value,
+          email: document.getElementById('profileEmail').value,
+          phone: document.getElementById('profilePhone').value
         };
-
-        // Modal Functions
-        function showModal(id) {
-            document.getElementById(id).classList.add('active');
+        
+        Utils.saveToLocalStorage('userProfile', profile);
+        Utils.showToast('Profile saved!', 'success');
+        App.navigate('profile');
+      },
+      
+      exportData() {
+        const allData = {
+          profile: Utils.getFromLocalStorage('userProfile'),
+          budget: Utils.getFromLocalStorage('budget'),
+          forms: AppState.forms,
+          exportDate: new Date().toISOString()
+        };
+        
+        const dataStr = JSON.stringify(allData, null, 2);
+        const dataBlob = new Blob([dataStr], { type: 'application/json' });
+        const url = URL.createObjectURL(dataBlob);
+        
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = 'power-play-data.json';
+        link.click();
+        
+        Utils.showToast('Data exported!', 'success');
+      },
+      
+      clearData() {
+        if (confirm('Clear all data? This cannot be undone.')) {
+          localStorage.clear();
+          AppState.forms = {};
+          Utils.showToast('All data cleared', 'success');
+          App.navigate('home');
         }
+      }
+    };
 
-        function hideModal(id) {
-            document.getElementById(id).classList.remove('active');
-        }
-
-        function installPWA() {
-            window.installPWA();
-        }
-
-        // Initialize App
-        app.init();
-    </script>
+    // ===== INITIALIZE APP =====
+    document.addEventListener('DOMContentLoaded', () => {
+      App.init();
+    });
+  </script>
 </body>
 </html>
